@@ -50,7 +50,28 @@ namespace Model
             }
             Capteurs.Add(newCapteur);
 			return true;
-        }
-        #endregion methods
-    }
+		}
+		public void AddCote(CoteExploitation newCote)
+		{
+			foreach (CoteExploitation cote in CotesExploitation)
+			{
+				if (cote.Id == newCote.Id)
+				{
+					throw new ArgumentException(nameof(Barrage) + " " + nameof(AddCote) + ": Id déjà présent.");
+				}
+				if (cote.Type == newCote.Type && cote.Seuil == newCote.Seuil)
+				{
+					throw new ArgumentException(nameof(Barrage) + " " + nameof(AddCote) + ": Il existe déjà une cote avec le meme seuil");
+				}
+				if (cote.Type == newCote.Type &&
+					((cote.Seuil > newCote.Seuil && cote.Criticité <= newCote.Criticité) ||
+					(cote.Seuil < newCote.Seuil && cote.Criticité >= newCote.Criticité)))
+				{
+					throw new ArgumentException(nameof(Barrage) + " " + nameof(AddCote) + ": Cote invalide. Verifiez les valeurs de cette cote par rapport aux autres.");
+				}
+			}
+			CotesExploitation.Add(newCote);
+		}
+		#endregion methods
+	}
 }

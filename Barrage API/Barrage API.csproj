@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Model\Barrage Model.csproj" />
+    <ProjectReference Include="..\Barrage Model\Barrage Model.csproj" />
   </ItemGroup>
 
 </Project>

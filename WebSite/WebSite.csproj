@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Model Auth LDAP_AD\AuthLDAP_AD Model.csproj" />
-    <ProjectReference Include="..\Model\Barrage Model.csproj" />
+    <ProjectReference Include="..\Auth LDAP_AD Model\AuthLDAP_AD Model.csproj" />
   </ItemGroup>
 
 </Project>
