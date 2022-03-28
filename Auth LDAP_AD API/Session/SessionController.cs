@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Model_AuthLDAP_AD;
+using AuthLDAP_AD_Model;
 
 namespace Auth_LDAP_AD_API.Session
 {
