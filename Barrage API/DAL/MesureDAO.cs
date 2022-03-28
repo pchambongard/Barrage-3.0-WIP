@@ -1,8 +1,8 @@
-﻿using Model;
-using System.Globalization;
+﻿using System.Globalization;
 using Npgsql;
+using Barrage_Model;
 
-namespace API.DAL
+namespace Barrage_API.DAL
 {
 	public class MesureDAO
 	{

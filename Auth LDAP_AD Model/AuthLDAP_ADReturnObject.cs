@@ -1,4 +1,4 @@
-﻿namespace Model_AuthLDAP_AD
+﻿namespace AuthLDAP_AD_Model
 {
 	public class AuthLDAP_ADReturnObject
 	{

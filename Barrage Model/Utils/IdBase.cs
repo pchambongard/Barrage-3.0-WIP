@@ -1,4 +1,4 @@
-﻿namespace Model.Utils
+﻿namespace Barrage_Model.Utils
 {
 	public abstract class IdBase
 	{

@@ -1,7 +1,7 @@
-﻿using Model;
+﻿using Barrage_Model;
 using Npgsql;
 
-namespace API.DAL
+namespace Barrage_API.DAL
 {
 	public class TypeCapteurDAO
 	{

@@ -1,4 +1,4 @@
-﻿using Model;
+﻿using Barrage_Model;
 
 namespace WebSite.Data
 {

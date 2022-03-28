@@ -1,8 +1,8 @@
-﻿using Model;
-using Microsoft.AspNetCore.Mvc;
-using API.DAL;
+﻿using Microsoft.AspNetCore.Mvc;
+using Barrage_Model;
+using Barrage_API.DAL;
 
-namespace API.Controllers
+namespace Barrage_API.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
