@@ -1,0 +1,68 @@
+﻿@namespace WebSite.Pages.Shared
+@using Model
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Barrage WIP</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Centre de contrôle
+            </NavLink>
+        </div>
+        @foreach (var barrage in barrages!)
+        {
+            var link = "/barrage/" + barrage.Id;
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@link">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @barrage.Libellé
+                </NavLink>
+            </div>
+        }
+        <div class="last">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Admin
+                </NavLink>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<style>
+.last
+{
+    position: absolute;
+    bottom: 0;
+
+}
+</style>
+@code
+{
+    private bool collapseNavMenu = true;
+    private List<Barrage>? barrages = new();
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu() { collapseNavMenu = !collapseNavMenu; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient client = new();
+
+        var getBarragesRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+        var getBarragesResponse = await client.SendAsync(getBarragesRequest).ConfigureAwait(false);
+
+        if (getBarragesResponse.IsSuccessStatusCode)
+        {
+            barrages = await getBarragesResponse.Content.ReadFromJsonAsync<List<Barrage>>().ConfigureAwait(false);
+        }
+
+    }
+}

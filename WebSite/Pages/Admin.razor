@@ -1,0 +1,627 @@
+﻿@using Model_AuthLDAP_AD
+@using WebSite.Data
+@using Model
+
+@page "/admin"
+
+@if (authRet!.Auth == true)
+{
+    <RadzenFieldset>
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="A Modifier:" />
+            </div>
+            <div class="col-md-8">
+                <RadzenDropDown @bind-Value=@propertySelected  Data="@properties" style="width: 100%;" Name="property"/>
+            </div>
+        </div>
+        @if (propertySelected == "Barrage")
+        {
+            <RadzenTabs SelectedIndex="0">
+                <Tabs>
+                    <RadzenTabsItem Text="Modifier">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Barrage" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown style="display: block" Data=@barrages Name="Barrage" @bind-Value=@barrageModifié TextProperty="Libellé" Class="w-100" />
+                            </div>
+                        </div>
+                        <RadzenTemplateForm TItem="Barrage" Data=@barrageModifié Submit=@OnSubmitBarrageModifié InvalidSubmit=@OnInvalidSubmit>
+                            <RadzenFieldset Text="Informations">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Type*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@typesBarrage Name="Type" @bind-Value=@barrageModifié!.Type TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Type" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Usage" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenTextBox style="display: block" Name="Usage" @bind-Value=@barrageModifié.Usage Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Hauteur du barrage" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Hauteur" @bind-Value=@barrageModifié.Hauteur  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Longueur du barrage" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Longueur" @bind-Value=@barrageModifié.Longueur  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Volume retenu" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="VolumeRetenu" @bind-Value=@barrageModifié.VolumeRetenu  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Surface de la retenue" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="SurfaceRetenue" @bind-Value=@barrageModifié.SurfaceRetenue  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Surface Bassin" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="SurfaceBassin" @bind-Value=@barrageModifié.SurfaceBassin  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Latitude" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Latitude" @bind-Value=@barrageModifié.Latitude  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Longitude" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Longitude" @bind-Value=@barrageModifié.Longitude  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Altitude" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Altitude" @bind-Value=@barrageModifié.Altitude  Class="w-100" />
+                                    </div>
+                                </div>
+                                <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                            </RadzenFieldset>
+                        </RadzenTemplateForm>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Créer">
+                        <RadzenTemplateForm TItem="Barrage" Data=@barrageCrée Submit=@OnSubmitBarrageCrée InvalidSubmit=@OnInvalidSubmit>
+                            <RadzenFieldset Text="Informations">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Type*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@typesBarrage Name="Type" @bind-Value=@barrageCrée!.Type TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Type" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Libellé*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenTextBox style="display: block" Name="Libellé" @bind-Value=@barrageCrée.Libellé Class="w-100" />
+                                        <RadzenRequiredValidator Component="Libellé" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Usage" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenTextBox style="display: block" Name="Usage" @bind-Value=@barrageCrée.Usage Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Hauteur du barrage" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Hauteur" @bind-Value=@barrageCrée.Hauteur  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Longueur du barrage" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Longueur" @bind-Value=@barrageCrée.Longueur  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Volume retenu" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="VolumeRetenu" @bind-Value=@barrageCrée.VolumeRetenu  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Surface de la retenue" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="SurfaceRetenue" @bind-Value=@barrageCrée.SurfaceRetenue  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Surface Bassin" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="SurfaceBassin" @bind-Value=@barrageCrée.SurfaceBassin  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Latitude" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Latitude" @bind-Value=@barrageCrée.Latitude  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Longitude" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Longitude" @bind-Value=@barrageCrée.Longitude  Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Altitude" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Altitude" @bind-Value=@barrageCrée.Altitude  Class="w-100" />
+                                    </div>
+                                </div>
+                                <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                            </RadzenFieldset>
+                        </RadzenTemplateForm>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        }
+        else if (propertySelected == "Capteur")
+        {
+            <RadzenTabs SelectedIndex="0">
+                <Tabs>
+                    <RadzenTabsItem Text="Modifier">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Barrage" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown style="display: block" Data=@barrages Name="Barrage" @bind-Value=@barrageCapteur TextProperty="Libellé" Class="w-100" Change=@(args => CapteurBarrageFiltre()) />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Capteur" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown style="display: block" Data=@capteursFiltre Name="Capteur" @bind-Value=@capteurModifié TextProperty="Libellé" Class="w-100" />
+                            </div>
+                        </div>
+                        <RadzenTemplateForm TItem="Capteur" Data=@capteurModifié Submit=@OnSubmitCapteurModifié InvalidSubmit=@OnInvalidSubmit>
+                            <RadzenFieldset Text="Informations">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Type*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@typesCapteur Name="Type" @bind-Value=@capteurModifié!.Type TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Type" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Actif" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenCheckBox style="display: block" Name="Actif" @bind-Value=@capteurModifié.Actif Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Principal" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenCheckBox style="display: block" Name="Principal" @bind-Value=@capteurModifié.Principal Class="w-100" />
+                                    </div>
+                                </div>
+                                <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                            </RadzenFieldset>
+                        </RadzenTemplateForm>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Créer">
+                        <RadzenTemplateForm TItem="Capteur" Data=@capteurCrée Submit=@OnSubmitCapteurCrée InvalidSubmit=@OnInvalidSubmit>
+                            <RadzenFieldset Text="Informations">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Barrage*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@barrages Name="Barrage" @bind-Value=@barrageCapteur TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Barrage" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Type*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@typesCapteur Name="Type" @bind-Value=@capteurCrée!.Type TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Type" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Libellé*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenTextBox style="display: block" Name="Libellé" @bind-Value=@capteurCrée.Libellé Class="w-100" />
+                                        <RadzenRequiredValidator Component="Libellé" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Actif" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenCheckBox style="display: block" Name="Actif" @bind-Value=@capteurCrée.Actif Class="w-100" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Principal" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenCheckBox style="display: block" Name="Principal" @bind-Value=@capteurCrée.Principal Class="w-100" />
+                                    </div>
+                                </div>
+                                <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                            </RadzenFieldset>
+                        </RadzenTemplateForm>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        }
+        else if (propertySelected == "Cote")
+        {
+            <RadzenTabs SelectedIndex="0">
+                <Tabs>
+                    <RadzenTabsItem Text="Modifier">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Barrage" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown style="display: block" Data=@barrages Name="Barrage" @bind-Value=@barrageCote TextProperty="Libellé" Class="w-100" Change=@(args => CoteBarrageFiltre())/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Cotes" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown style="display: block" Data=@cotesFiltre Name="Cotes" @bind-Value=@coteModifiée TextProperty="Libellé" Class="w-100" />
+                            </div>
+                        </div>
+                        <RadzenTemplateForm TItem="CoteExploitation" Data=@coteModifiée Submit=@OnSubmitCoteModifiée InvalidSubmit=@OnInvalidSubmit>
+                            <RadzenFieldset Text="Informations">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Type*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@typesCote Name="Type" @bind-Value=@coteModifiée!.Type TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Type" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Seuil*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Seuil" @bind-Value=@coteModifiée.Seuil Class="w-100" />
+                                        <RadzenRequiredValidator Component="Seuil" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Criticité*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Criticité" @bind-Value=@coteModifiée.Criticité Class="w-100" />
+                                        <RadzenRequiredValidator Component="Criticité" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                            </RadzenFieldset>
+                        </RadzenTemplateForm>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Créer">
+                        <RadzenTemplateForm TItem="CoteExploitation" Data=@coteCrée Submit=@OnSubmitCoteCrée InvalidSubmit=@OnInvalidSubmit>
+                            <RadzenFieldset Text="Informations">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Barrage*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@barrages Name="Barrage" @bind-Value=@barrageCote TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Barrage" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Type*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenDropDown style="display: block" Data=@typesCote Name="Type" @bind-Value=@coteCrée!.Type TextProperty="Libellé" Class="w-100" />
+                                        <RadzenRequiredValidator Component="Type" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Libellé*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenTextBox style="display: block" Name="Libellé" @bind-Value=@coteCrée.Libellé Class="w-100" />
+                                        <RadzenRequiredValidator Component="Libellé" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Seuil*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Seuil" @bind-Value=@coteCrée.Seuil Class="w-100" />
+                                        <RadzenRequiredValidator Component="Seuil" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <RadzenLabel Text="Criticité*" />
+                                    </div>
+                                    <div class="col">
+                                        <RadzenNumeric style="display: block" Name="Criticité" @bind-Value=@coteCrée.Criticité Class="w-100" />
+                                        <RadzenRequiredValidator Component="Criticité" Text="Champ requis" Style="position: absolute"/>
+                                    </div>
+                                </div>
+                                <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                            </RadzenFieldset>
+                        </RadzenTemplateForm>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        }
+    </RadzenFieldset>
+    <div style="float:left; padding-top:10px">
+        <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isVisible"/>
+        <RadzenLabel Text="@nonValide" Visible="@isVisible"/>
+    </div>
+}
+else
+{
+    <RadzenCard Style="width: 30%;">
+        <h2 class="mb-4">Login</h2>
+        <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args)) />
+        <div style="float:left; padding-top:10px">
+            <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isLoginVisible"/>
+            <RadzenLabel Text="@authRet.State" Visible="@isLoginVisible"/>
+        </div>
+    </RadzenCard>
+}
+
+
+@code
+{
+    private List<string> properties = new() {"Barrage", "Capteur", "Cote"};
+    private string propertySelected = "Barrage";
+
+    private List<Barrage>? barrages = new();
+    private List<Capteur>? capteurs = new();
+    private List<CoteExploitation>? cotes = new();
+    private List<TypeBarrage>? typesBarrage = new();
+    private List<TypeCapteur>? typesCapteur = new();
+    private List<TypeCoteExploitation>? typesCote = new();
+
+    public Barrage? barrageModifié = new();
+    public Barrage? barrageCrée = new();
+
+    public List<Capteur> capteursFiltre = new();
+    public Capteur? capteurModifié = new();
+    public Capteur? capteurCrée = new();
+    public Barrage? barrageCapteur = new();
+
+    public List<CoteExploitation> cotesFiltre = new();
+    public CoteExploitation? coteModifiée = new();
+    public CoteExploitation? coteCrée = new();
+    public Barrage? barrageCote = new();
+
+    private AuthLDAP_ADReturnObject? authRet = new(false, "");
+    private bool isLoginVisible = false;
+
+    private string nonValide = "Objet Non Valide.";
+    private bool isVisible = false;
+
+    async Task OnSubmitBarrageCrée(Barrage barrageCrée)
+    {
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Barrage/idSecteur=1"));
+        request.Content = JsonContent.Create(barrageCrée);
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+    }
+    async Task OnSubmitBarrageModifié(Barrage barrageModifié)
+    {
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/Barrage/idSecteur=1"));
+        request.Content = JsonContent.Create(barrageModifié);
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        Console.WriteLine(response.StatusCode);
+    }
+    async Task OnSubmitCapteurCrée(Capteur capteurCrée)
+    {
+        if (barrageCapteur!.AddCapteur(capteurCrée) == false)
+        {
+            isVisible = true;
+            return; 
+        }
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
+        request.Content = JsonContent.Create(capteurCrée);
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+    }
+    async Task OnSubmitCapteurModifié(Capteur capteurModifié)
+    {
+        if (capteurModifié.Principal == true)
+        {
+            foreach (Capteur capteur in barrageCapteur!.Capteurs)
+            {
+                if (capteur.Libellé != capteurModifié.Libellé && capteur.Principal == true)
+                {
+                    isVisible = true;
+                    return;
+                }
+            }
+        }
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
+        request.Content = JsonContent.Create(capteurModifié);
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+    }
+    async Task OnSubmitCoteCrée(CoteExploitation coteCrée)
+    {
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
+        request.Content = JsonContent.Create(coteCrée);
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+    }
+    async Task OnSubmitCoteModifiée(CoteExploitation coteModifiée)
+    {
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
+        request.Content = JsonContent.Create(coteModifiée);
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args){}
+    void CapteurBarrageFiltre() { capteursFiltre = barrageCapteur!.Capteurs; capteurModifié = capteursFiltre[0]; }
+    void CoteBarrageFiltre() { cotesFiltre = barrageCote!.CotesExploitation; coteModifiée = cotesFiltre[0]; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient client = new();
+        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/idBarrage=1"));
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode)
+        {
+            barrageModifié = await response.Content.ReadFromJsonAsync<Barrage>().ConfigureAwait(false);
+        }
+        barrageCapteur = barrageModifié;
+        capteursFiltre = barrageCapteur!.Capteurs;
+        capteurModifié = barrageModifié!.Capteurs[0];
+        barrageCote = barrageModifié;
+        cotesFiltre = barrageCote.CotesExploitation;
+        coteModifiée = barrageModifié.CotesExploitation[0];
+    }
+
+    async Task OnLogin(LoginArgs args)
+    {
+        HttpClient client = new();
+        List<string> infos = new();
+        string searchBase = "LDAP://auth.intra.cg30.fr:389/DC=intra,DC=cg30,DC=fr";
+        string filter = "memberOf=CN=BARRAGE,OU=Globaux-Fonctionnels,OU=Groupes-globaux,OU=CG30-Groupes,OU=CG30-Usr-Grp,DC=intra,DC=cg30,DC=fr";
+
+        infos.Add(searchBase);
+        infos.Add(args.Username);
+        infos.Add(args.Password);
+        infos.Add(filter);
+
+        var authRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5114/api/Session/"));
+        authRequest.Content = JsonContent.Create(infos);
+        var authResponse = await client.SendAsync(authRequest);
+        if (authResponse.IsSuccessStatusCode)
+        {
+            authRet = await authResponse.Content.ReadFromJsonAsync<AuthLDAP_ADReturnObject>().ConfigureAwait(false);
+            Console.WriteLine(authRet!.Auth);
+            Console.WriteLine(authRet.State);
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+        var response = await client.SendAsync(request).ConfigureAwait(false);
+        if (response.IsSuccessStatusCode)
+        {
+            barrages = await response.Content.ReadFromJsonAsync<List<Barrage>>().ConfigureAwait(false);
+        }
+        request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeBarrage/"));
+        response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode)
+        {
+            typesBarrage = await response.Content.ReadFromJsonAsync<List<TypeBarrage>>().ConfigureAwait(false);
+        }
+        request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeCapteur/"));
+        response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode)
+        {
+            typesCapteur = await response.Content.ReadFromJsonAsync<List<TypeCapteur>>().ConfigureAwait(false);
+        }
+        request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeCoteExploitation/"));
+        response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode)
+        {
+            typesCote = await response.Content.ReadFromJsonAsync<List<TypeCoteExploitation>>().ConfigureAwait(false);
+        }
+        foreach(Barrage barrage in barrages!)
+        {
+            foreach(Capteur capteur in barrage.Capteurs)
+            {
+                capteurs!.Add(capteur);
+            }
+            foreach(CoteExploitation cote in barrage.CotesExploitation)
+            {
+                cotes!.Add(cote);
+            }
+        }
+        isLoginVisible = authRet!.Auth == false ? true : false;
+    }
+}

@@ -1,0 +1,193 @@
+﻿@using System.Globalization
+@using CsvHelper
+@using WebSite.Data
+@using WebSite.CSV
+@using WebSite
+@using Model
+
+@page "/barrage/{Id}"
+
+<RadzenCard>
+
+    <h2 style = "text-align:center">@barrage!.Libellé</h2> 
+
+    @if (chart.CoteItem.Count == 0)
+    {
+        <text>Loading...</text>
+    }
+    else
+    {
+        <div align="left">
+            <RadzenDatePicker Style="width: 15%" @bind-value=@date1 TValue="DateTime" ShowTime="true" ShowSeconds="true" HoursStep="1" MinutesStep="5" SecondsStep="10" DateFormat="dd/MM/yyyy HH:mm"/>
+            <RadzenDatePicker Style="width: 15%" @bind-value=@date2 TValue="DateTime" ShowTime="true" ShowSeconds="true" HoursStep="1" MinutesStep="5" SecondsStep="10" DateFormat="dd/MM/yyyy HH:mm"/>
+            <RadzenButton Style="width: 50px" Click=@SetChart Icon="refresh" ButtonStyle="ButtonStyle.Light" />
+        </div>
+        @if (chart.LimniItem.Count > 0)
+        {
+            <h3 style = "text-align:center">Limnimétrie</h3>
+            <RadzenChart @ref="LimniChart">
+                @for (int i = 0; i < chart.LimniItem.Count; i++)
+                {
+                    string title = chart.LimniCapteurs[i].Libellé ?? "";
+                    <RadzenLineSeries Smooth="true" Data="@chart.LimniItem[i]" CategoryProperty="Date" ValueProperty="Valeur" Title="@title"/>
+                }
+                @for (int i = 0; i < chart.CoteItem.Count; i++)
+                {
+                    string title = barrage.CotesExploitation[i].Libellé ?? "";
+                    <RadzenLineSeries Data="@chart.CoteItem[i]" CategoryProperty="Date" ValueProperty="Valeur" Title="@title" LineType="LineType.Dashed"/>
+                }
+                <RadzenValueAxis Formatter="@Format">
+                    <RadzenAxisTitle Text="Hauteur (m)" />
+                </RadzenValueAxis>
+                <RadzenCategoryAxis Step="@step" Padding="30" FormatString="{0:g}">
+                  <RadzenAxisTitle Text="Date" />
+                </RadzenCategoryAxis>
+            </RadzenChart>
+        }
+        <div class="inner">
+            @if (chart.PluvioItem.Count > 0)
+            {
+                <h3 style = "text-align:center">Pluviométrie</h3>
+                <RadzenChart @ref="PluvioChart" Style="margin-top: 30px">
+                    @for (int i = 0; i < chart.PluvioItem.Count; i++)
+                    {
+                        string title = chart.PluvioCapteurs[i].Libellé ?? "";
+                        <RadzenLineSeries Smooth="true" Data="@chart.PluvioItem[i]" CategoryProperty="Date" ValueProperty="Valeur" Title="@title"/>
+                    }
+                    <RadzenValueAxis Formatter="@Format">
+                        <RadzenAxisTitle Text="Pluie (mm)" />
+                    </RadzenValueAxis>
+                    <RadzenCategoryAxis Step="@step" FormatString="{0:g}"/>
+                </RadzenChart>
+            }
+        </div>
+
+        <div class="inner">
+            @if (chart.TempItem.Count > 0)
+            {
+                <h3 style = "text-align:center">Température</h3>
+                <RadzenChart @ref="TempChart">
+                    @for (int i = 0; i < chart.TempItem.Count; i++)
+                    {
+                        string title = chart.TempCapteurs[i].Libellé ?? "";
+                        <RadzenLineSeries Smooth="true" Data="@chart.TempItem[i]" CategoryProperty="Date" ValueProperty="Valeur" Title="@title"/>
+                    }
+                    <RadzenValueAxis Formatter="@Format">
+                        <RadzenAxisTitle Text="Température (°C)" />
+                    </RadzenValueAxis>
+                    <RadzenCategoryAxis Step="@step" FormatString="{0:g}"/>
+                </RadzenChart>
+            }
+        </div>
+        <div align="left">
+            <RadzenButton Text="Export Limnimétrie" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickLimni/>
+            <RadzenButton Text="Export Pluviométrie" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickPluvio/>
+            <RadzenButton Text="Export Température" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickTemp/>
+        </div>
+    }
+</RadzenCard>
+<style>
+.inner {
+    padding-top:25px;
+}
+</style>
+@code
+{
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    DateTime date1 = DateTime.Now - TimeSpan.FromDays(1);
+    DateTime date2 = DateTime.Now;
+    TimeSpan step = TimeSpan.FromHours(4);
+
+    private ChartItem chart = new();
+    private Barrage? barrage = new();
+    private bool busy = false;
+
+    private List<MesureCSV> limni = new();
+    private List<MesureCSV> pluvio = new();
+    private List<MesureCSV> temp = new();
+
+    private RadzenChart LimniChart = new();
+    private RadzenChart PluvioChart = new();
+    private RadzenChart TempChart = new();
+
+    protected string Format (object value) { return (decimal.Round(Convert.ToDecimal(value), 3)).ToString(); }
+
+    protected void Reload() { LimniChart.Reload(); PluvioChart.Reload(); TempChart.Reload(); }
+
+    protected void OnClickLimni()
+    {
+        busy = true;
+        MesureCSV.MesuresToCSV(limni, barrage!.Libellé ?? "", "Limni");
+        busy = false;
+    }
+    protected void OnClickPluvio()
+    {
+        busy = true;
+        MesureCSV.MesuresToCSV(pluvio, barrage!.Libellé ?? "", "Pluvio");
+        busy = false;
+    }
+    protected void OnClickTemp()
+    {
+        busy = true;
+        MesureCSV.MesuresToCSV(temp, barrage!.Libellé ?? "", "Temp");
+        busy = false;
+    }
+    protected override async Task OnParametersSetAsync() { await SetChart(); }
+
+    protected async Task SetChart()
+    {
+        limni = new();
+        pluvio = new();
+        temp = new();
+        HttpClient client = new();
+
+        chart.SetDate(date1, date2);
+        step = (date2 - date1) / 6;
+        chart.RenewChart();
+
+        var getBarrageByIdRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/idBarrage=" + Id));
+        var getBarrageByIdResponse = await client.SendAsync(getBarrageByIdRequest).ConfigureAwait(false);
+        barrage = await getBarrageByIdResponse.Content.ReadFromJsonAsync<Barrage>().ConfigureAwait(false);
+        
+        if (getBarrageByIdResponse.IsSuccessStatusCode)
+        {
+            chart.SetCote(barrage);
+            foreach (Capteur capteur in barrage!.Capteurs)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                request.Content = JsonContent.Create(chart.Dates);
+                var response = await client.SendAsync(request).ConfigureAwait(false);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    List<Mesure>? mesures = await response.Content.ReadFromJsonAsync<List<Mesure>>().ConfigureAwait(false);
+                    if (capteur.Type!.Id == 1)
+                    {
+                        foreach (Mesure mesure in mesures!)
+                        {
+                            limni.Add(new(capteur.Id, barrage.Id, mesure.Gdh, mesure.Valeur));
+                        }
+                    }
+                    else if (capteur.Type!.Id == 2)
+                    {
+                        foreach (Mesure mesure in mesures!)
+                        {
+                            pluvio.Add(new(capteur.Id, barrage.Id, mesure.Gdh, mesure.Valeur));
+                        }
+                    }
+                    else if (capteur.Type!.Id == 3)
+                    {
+                        foreach (Mesure mesure in mesures!)
+                        {
+                            temp.Add(new(capteur.Id, barrage.Id, mesure.Gdh, mesure.Valeur));
+                        }
+                    }
+                    chart.SetCapteurInChart(capteur, mesures);
+                }
+            }
+        }
+        Reload();
+    }
+}

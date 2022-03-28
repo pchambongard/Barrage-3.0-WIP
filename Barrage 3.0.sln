@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C29BDB43-F672-4CEA-8696-2A1A0C38F8FF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barrage API", "API\Barrage API.csproj", "{49DEA75C-B456-419B-A9EF-7B5E07B47D33}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barrage Model", "Model\Barrage Model.csproj", "{E05ED31C-8254-4102-AE6A-AA6131665DC9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service FTP", "Service FTP\Service FTP.csproj", "{EC532CE0-2DC8-4591-AC9C-C83A08A7B8EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthLDAP_AD Model", "Model Auth LDAP_AD\AuthLDAP_AD Model.csproj", "{F057E663-9AE9-401E-A8FC-D59E9F7DE4B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth LDAP_AD API", "API Auth LDAP-AD\Auth LDAP_AD API.csproj", "{6C8EF0A3-BCC1-4364-B681-08099484988B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSite", "WebSite\WebSite.csproj", "{EBD5F62A-D59B-4552-9DB5-A5446863892C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49DEA75C-B456-419B-A9EF-7B5E07B47D33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49DEA75C-B456-419B-A9EF-7B5E07B47D33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49DEA75C-B456-419B-A9EF-7B5E07B47D33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49DEA75C-B456-419B-A9EF-7B5E07B47D33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E05ED31C-8254-4102-AE6A-AA6131665DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E05ED31C-8254-4102-AE6A-AA6131665DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E05ED31C-8254-4102-AE6A-AA6131665DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E05ED31C-8254-4102-AE6A-AA6131665DC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC532CE0-2DC8-4591-AC9C-C83A08A7B8EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC532CE0-2DC8-4591-AC9C-C83A08A7B8EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC532CE0-2DC8-4591-AC9C-C83A08A7B8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC532CE0-2DC8-4591-AC9C-C83A08A7B8EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F057E663-9AE9-401E-A8FC-D59E9F7DE4B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F057E663-9AE9-401E-A8FC-D59E9F7DE4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F057E663-9AE9-401E-A8FC-D59E9F7DE4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F057E663-9AE9-401E-A8FC-D59E9F7DE4B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C8EF0A3-BCC1-4364-B681-08099484988B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C8EF0A3-BCC1-4364-B681-08099484988B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C8EF0A3-BCC1-4364-B681-08099484988B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C8EF0A3-BCC1-4364-B681-08099484988B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBD5F62A-D59B-4552-9DB5-A5446863892C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBD5F62A-D59B-4552-9DB5-A5446863892C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBD5F62A-D59B-4552-9DB5-A5446863892C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBD5F62A-D59B-4552-9DB5-A5446863892C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4A14694-21EE-4514-AD3D-2F9E149F01B0}
+	EndGlobalSection
+EndGlobal
