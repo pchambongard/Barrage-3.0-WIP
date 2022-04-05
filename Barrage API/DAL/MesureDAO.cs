@@ -10,7 +10,7 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgprod;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
 				await connection.OpenAsync().ConfigureAwait(false);
 
 				List<Mesure> mesures = new();
@@ -18,7 +18,7 @@ namespace Barrage_API.DAL
 				await using NpgsqlCommand commande = new()
 				{
 					Connection = connection,
-					CommandText = "SELECT id_capteur, id_barrage, gdh, valeur FROM enregistrement m WHERE id_barrage=:id_barrage AND m.gdh >= :date AND m.gdh <= :date2;"
+					CommandText = "SELECT id_capteur, id_barrage, gdh, valeur, debit_sortant, debit_entrant, volume  FROM mesures m WHERE id_barrage=:id_barrage AND m.gdh >= :date AND m.gdh <= :date2;"
 				};
 
 				commande.Parameters.Add(new NpgsqlParameter<DateTime>(":date", date));
@@ -34,7 +34,10 @@ namespace Barrage_API.DAL
 							idCapteur: reader.GetInt32(reader.GetOrdinal("id_capteur")),
 							idBarrage: id_barrage,
 							date: reader.GetDateTime(reader.GetOrdinal("gdh")),
-							valeur: reader.GetDecimal(reader.GetOrdinal("valeur")));
+							valeur: reader.GetDecimal(reader.GetOrdinal("valeur")),
+							debitSortant: reader.GetDecimal(reader.GetOrdinal("debit_sortant")),
+							debitEntrant15mn: reader.GetDecimal(reader.GetOrdinal("debit_entrant")),
+							volume: reader.GetDecimal(reader.GetOrdinal("volume")));
 						mesures.Add(mesure);
 
 					}
@@ -56,7 +59,7 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgprod;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
 				await connection.OpenAsync().ConfigureAwait(false);
 
 				List<Mesure> mesures = new();
@@ -64,7 +67,7 @@ namespace Barrage_API.DAL
 				await using NpgsqlCommand commande = new()
 				{
 					Connection = connection,
-					CommandText = "SELECT id_capteur, id_barrage, gdh, valeur FROM enregistrement m WHERE id_capteur=:id_capteur AND m.gdh >= :date AND m.gdh <= :date2;"
+					CommandText = "SELECT id_capteur, id_barrage, gdh, valeur, debit_sortant, debit_entrant, volume FROM mesures m WHERE id_capteur=:id_capteur AND m.gdh >= :date AND m.gdh <= :date2;"
 				};
 
 				commande.Parameters.Add(new NpgsqlParameter<DateTime>(":date", date));
@@ -78,10 +81,13 @@ namespace Barrage_API.DAL
 					while (await reader.ReadAsync())
 					{
 						Mesure mesure = new(
-							idCapteur: id_capteur,
+							idCapteur: reader.GetInt32(reader.GetOrdinal("id_capteur")),
 							idBarrage: id_barrage,
 							date: reader.GetDateTime(reader.GetOrdinal("gdh")),
-							valeur: reader.GetDecimal(reader.GetOrdinal("valeur")));
+							valeur: reader.GetDecimal(reader.GetOrdinal("valeur")),
+							debitSortant: reader.GetDecimal(reader.GetOrdinal("debit_sortant")),
+							debitEntrant15mn: reader.GetDecimal(reader.GetOrdinal("debit_entrant")),
+							volume: reader.GetDecimal(reader.GetOrdinal("volume")));
 						mesures.Add(mesure);
 
 					}
@@ -103,13 +109,13 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgprod;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
 				await connection.OpenAsync().ConfigureAwait(false);
 
 				await using NpgsqlCommand commande = new()
 				{
 					Connection = connection,
-					CommandText = "SELECT id_capteur, id_barrage, gdh, valeur FROM enregistrement m WHERE id_capteur=:id_capteur AND m.gdh = (SELECT MAX(gdh) FROM enregistrement WHERE id_capteur=:id_capteur)"
+					CommandText = "SELECT id_capteur, id_barrage, gdh, valeur, debit_sortant, debit_entrant, volume FROM mesures m WHERE id_capteur=:id_capteur AND m.gdh = (SELECT MAX(gdh) FROM mesures WHERE id_capteur=:id_capteur)"
 				};
 				commande.Parameters.Add(new NpgsqlParameter<int>(":id_capteur", id_capteur));
 
@@ -120,10 +126,14 @@ namespace Barrage_API.DAL
 					reader.Read();
 
 					Mesure mesure = new(
-						idCapteur: id_capteur,
-						idBarrage: id_barrage,
-						date: reader.GetDateTime(reader.GetOrdinal("gdh")),
-						valeur: reader.GetDecimal(reader.GetOrdinal("valeur")));
+							idCapteur: id_capteur,
+							idBarrage: id_barrage,
+							date: reader.GetDateTime(reader.GetOrdinal("gdh")),
+							valeur: reader.GetDecimal(reader.GetOrdinal("valeur")),
+							debitSortant: reader.GetDecimal(reader.GetOrdinal("debit_sortant")),
+							debitEntrant15mn: reader.GetDecimal(reader.GetOrdinal("debit_entrant")),
+							volume: reader.GetDecimal(reader.GetOrdinal("volume")));
+
 					connection.Close();
 					connection.Dispose();
 					return mesure;
@@ -146,11 +156,15 @@ namespace Barrage_API.DAL
 
 				await connection.OpenAsync().ConfigureAwait(false);
 
-				string commande = "INSERT INTO mesures(id_barrage, id_capteur, gdh, valeur) values";
+				string commande = "INSERT INTO mesures(id_barrage, id_capteur, gdh, valeur, debit_sortant, debit_entrant, volume) values";
 
 				foreach (Mesure Mesure in mesures)
 				{
-					string str = $"({Mesure.IdBarrage},{Mesure.IdCapteur},'{Mesure.Gdh}',{Mesure.Valeur.ToString(CultureInfo.InvariantCulture)}),";
+					string str = $"({Mesure.IdBarrage},{Mesure.IdCapteur},'{Mesure.Date}'," +
+						$"{decimal.Round(Mesure.Valeur, 3).ToString(CultureInfo.InvariantCulture)}, " +
+						$"{decimal.Round(Mesure.DebitSortant, 3).ToString(CultureInfo.InvariantCulture)}, " +
+						$"{decimal.Round(Mesure.DebitEntrant15mn, 3).ToString(CultureInfo.InvariantCulture)}, " +
+						$"{decimal.Round(Mesure.Volume, 3).ToString(CultureInfo.InvariantCulture)}),";
 					commande += str;
 				}
 				char[] tmp = commande.ToCharArray();

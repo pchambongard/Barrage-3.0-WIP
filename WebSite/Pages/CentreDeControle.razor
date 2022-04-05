@@ -5,67 +5,44 @@
 
 <PageTitle>Centre De Controle</PageTitle>
 
-@if(barrages!.Count == 0)
+@if(barragesView.Count == 0)
 {
     <text>Loading...</text>
 }
 else
 {
-    @foreach (Barrage barrage in barrages)
+    @foreach (BarrageView barrage in barragesView)
     {
-        var info = infos.Find(x => x.Barrage == barrage.Libellé);
-        var link = "/barrage/" + barrage.Id;
-        double value = 0;
-        double crue = 0;
-        double danger = 0;
-        double max = 0;
-        double min = 0;
-        double step = 0;
-        @if (info != null && barrage.CotesExploitation.Find(x => x.Criticité == 2) != null)
-        {
-            crue = (double)barrage.CotesExploitation.Find(x => x.Criticité == 2)!.Seuil;
-            value = (double)info!.Valeur;
-            min = Math.Truncate(crue * 0.8);
-            @if (barrage.CotesExploitation.Find(x => x.Criticité == 4) == null)
-            {
-                max = Math.Truncate(crue * 1.2);
-                danger = max;
-            }
-            else
-            {
-                danger = (double)barrage.CotesExploitation.Find(x => x.Criticité == 4)!.Seuil;
-                max = Math.Truncate(danger * 1.2);
-            }
-            step = (max - min) / 4;
-        }
+        barrage.SetGauge();
+		var link = "/barrage/" + barrage.Id;
         <RadzenCard>
             <NavLink class="nav-link" href="@link"> @barrage.Libellé </NavLink>
             <div class= "wrapper">
                 <div class="first">
                     <RadzenRadialGauge Style="width: 250px; height: 250px;">
-                        <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="@step" Min=@min Max=@max TickPosition=GaugeTickPosition.Inside ShowTickLabels="true">
-                                <RadzenRadialGaugeScalePointer Value=@value Length="0.8" ShowValue=true>
+                        <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="@barrage.Step" Min=@barrage.Min Max=@barrage.Max TickPosition=GaugeTickPosition.Inside ShowTickLabels="true">
+                                <RadzenRadialGaugeScalePointer Value=@barrage.CapteurPrincipal!.Valeur Length="0.8" ShowValue=true>
                                     <Template Context="pointer">
                                         <h5>
                                             @pointer.Value <sup>m</sup>
                                         </h5>
                                     </Template>
                                 </RadzenRadialGaugeScalePointer>
-                                <RadzenRadialGaugeScaleRange From=@min To=@crue Fill="green" Stroke="true"/>
-                                <RadzenRadialGaugeScaleRange From=@crue To=@danger Fill="orange" />
-                                <RadzenRadialGaugeScaleRange From=@danger To=@max Fill="red" />
+                                <RadzenRadialGaugeScaleRange From=@barrage.Min To=@barrage.Crue Fill="green" Stroke="true"/>
+                                <RadzenRadialGaugeScaleRange From=@barrage.Crue To=@barrage.Danger Fill="orange" />
+                                <RadzenRadialGaugeScaleRange From=@barrage.Danger To=@barrage.Max Fill="red" />
                             </RadzenRadialGaugeScale>
                     </RadzenRadialGauge>
                 </div>
                 <div class="second">
-                    <RadzenDataGrid  Style= "width: 1200px" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple"
+                    <RadzenDataGrid Style= "width: 1200px" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple"
                         AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                        Data="@infos.FindAll(x => x.Barrage == barrage.Libellé)" TItem="CapteurView" LogicalFilterOperator="LogicalFilterOperator.Or">
+                        Data="@barrage.Capteurs" TItem="CapteurView" LogicalFilterOperator="LogicalFilterOperator.Or">
                         <Columns>
                             <RadzenDataGridColumn TItem="CapteurView" Property="Capteur" Filterable="false" Title="Capteur" Width="175px" TextAlign="TextAlign.Center" />
                             <RadzenDataGridColumn TItem="CapteurView" Property="Date" Filterable="false" Title="Date de la dernière mesure" Width="200px" TextAlign="TextAlign.Center" />
                             <RadzenDataGridColumn TItem="CapteurView" Property="Valeur" Filterable="false" Title="Valeur" Width="75px" TextAlign="TextAlign.Center" />
-                            <RadzenDataGridColumn TItem="CapteurView" Property="Cote" Filterable="false" Title="Dernière cote atteinte" Width="200px" TextAlign="TextAlign.Center" />
+                            <RadzenDataGridColumn TItem="CapteurView" Property="DerniereCoteAtteinte" Filterable="false" Title="Dernière cote atteinte" Width="200px" TextAlign="TextAlign.Center" />
                         </Columns>
                     </RadzenDataGrid>
                 </div>
@@ -90,43 +67,70 @@ else
 
 @code
 {
-    List<Barrage>? barrages = new();
+    List<BarrageView> barragesView = new();
     List<CapteurView> infos = new();
 
     protected override async Task OnInitializedAsync()
     {
         HttpClient client = new();
+        List<Barrage>? barrages = new();
         var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
         var response = await client.SendAsync(request).ConfigureAwait(false);
-        
+
         if (response.IsSuccessStatusCode)
         {
             barrages = await response.Content.ReadFromJsonAsync<List<Barrage>>().ConfigureAwait(false);
         }
-        foreach (Barrage barrage in barrages!)
+        barrages!.Sort((x,y) => { return y.Capteurs.FindAll(a => a.Actif == true).Count.CompareTo(x.Capteurs.FindAll(b => b.Actif == true).Count); });
+
+        foreach (Barrage barrage in barrages)
         {
+            barragesView.Add(new(barrage.Id, barrage.Libellé!));
+            barragesView[barragesView.Count - 1].Cotes = barrage.CotesExploitation;
             foreach(Capteur capteur in from capteur in barrage.Capteurs where capteur.Actif == true select capteur)
             {
-                var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
-                var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
-
-                infos.Add(new(capteur.Id, barrage.Libellé ?? "", capteur.Libellé ?? ""));
-                if (capteurResponse.IsSuccessStatusCode)
+                if (capteur.Type!.Id == 3)
                 {
-                    Mesure? mesure = await capteurResponse.Content.ReadFromJsonAsync<Mesure>().ConfigureAwait(false);
-                    infos[infos.Count - 1].Date = mesure!.Gdh.ToString();
-                    infos[infos.Count - 1].Valeur = mesure!.Valeur;
-                    foreach (CoteExploitation cote in barrage.CotesExploitation)
+                    var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/MesureTemperature/last/idCapteur=" + capteur.Id));
+                    var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
+                    if (capteurResponse.IsSuccessStatusCode)
                     {
-                        if (mesure.Valeur >= cote.Seuil)
+                        Mesure? mesure = await capteurResponse.Content.ReadFromJsonAsync<Mesure>().ConfigureAwait(false);
+                        if (mesure != null)
                         {
-                            infos[infos.Count - 1].Cote = cote.Libellé ?? "";
+                            barragesView[barragesView.Count - 1].Capteurs.Add(new(capteur.Libellé!, capteur.Type!.Libellé!, mesure.Date, (double)mesure.Valeur));
                         }
                     }
                 }
                 else
                 {
-                    infos[infos.Count - 1].Date = "Pas de mesures dans les deux dernières heures.";
+                    if (capteur.Principal == true)
+                    {
+                        var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                        var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
+                        if (capteurResponse.IsSuccessStatusCode)
+                        {
+                            Mesure? mesure = await capteurResponse.Content.ReadFromJsonAsync<Mesure>().ConfigureAwait(false);
+                            if (mesure != null)
+                            {
+                                barragesView[barragesView.Count - 1].CapteurPrincipal = new(capteur.Libellé!, capteur.Type!.Libellé!, mesure.Date, (double)mesure.Valeur);
+                                barragesView[barragesView.Count - 1].Capteurs.Add(new(capteur.Libellé!, capteur.Type!.Libellé!, mesure.Date, (double)mesure.Valeur));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                        var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
+                        if (capteurResponse.IsSuccessStatusCode)
+                        {
+                            Mesure? mesure = await capteurResponse.Content.ReadFromJsonAsync<Mesure>().ConfigureAwait(false);
+                            if (mesure != null)
+                            {
+                                barragesView[barragesView.Count - 1].Capteurs.Add(new(capteur.Libellé!, capteur.Type!.Libellé!, mesure.Date, (double)mesure.Valeur));
+                            }
+                        }
+                    }
                 }
             }
         }

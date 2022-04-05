@@ -14,12 +14,12 @@
 		}
 		public LabelledIdBase(string libellé)
 		{
-			Libellé = libellé ?? throw new ArgumentNullException(nameof(libellé));
+			Libellé = libellé;
 		}
 		public LabelledIdBase(int id, string libellé)
 		{
 			Id = id;
-			Libellé = libellé ?? throw new ArgumentNullException(nameof(libellé));
+			Libellé = libellé;
 		}
 		#endregion constructeurs
 

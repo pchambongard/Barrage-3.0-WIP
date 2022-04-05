@@ -1,5 +1,4 @@
 ﻿@using AuthLDAP_AD_Model
-@using WebSite.Data
 @using Barrage_Model
 
 @page "/admin"
@@ -431,8 +430,8 @@
         }
     </RadzenFieldset>
     <div style="float:left; padding-top:10px">
-        <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isVisible"/>
-        <RadzenLabel Text="@nonValide" Visible="@isVisible"/>
+        <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isObjetNonValideWarningVisible"/>
+        <RadzenLabel Text="@objetNonValide" Visible="@isObjetNonValideWarningVisible"/>
     </div>
 }
 else
@@ -441,8 +440,8 @@ else
         <h2 class="mb-4">Login</h2>
         <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args)) />
         <div style="float:left; padding-top:10px">
-            <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isLoginVisible"/>
-            <RadzenLabel Text="@authRet.State" Visible="@isLoginVisible"/>
+            <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isLoginWarningVisible"/>
+            <RadzenLabel Text="@authRet.State" Visible="@isLoginWarningVisible"/>
         </div>
     </RadzenCard>
 }
@@ -454,8 +453,8 @@ else
     private string propertySelected = "Barrage";
 
     private List<Barrage>? barrages = new();
-    private List<Capteur>? capteurs = new();
-    private List<CoteExploitation>? cotes = new();
+    private List<Capteur> capteurs = new();
+    private List<CoteExploitation> cotes = new();
     private List<TypeBarrage>? typesBarrage = new();
     private List<TypeCapteur>? typesCapteur = new();
     private List<TypeCoteExploitation>? typesCote = new();
@@ -474,75 +473,133 @@ else
     public Barrage? barrageCote = new();
 
     private AuthLDAP_ADReturnObject? authRet = new(false, "");
-    private bool isLoginVisible = false;
+    private bool isLoginWarningVisible = false;
 
-    private string nonValide = "Objet Non Valide.";
-    private bool isVisible = false;
+    private string objetNonValide = "Objet Non Valide.";
+    private bool isObjetNonValideWarningVisible = false;
 
     async Task OnSubmitBarrageCrée(Barrage barrageCrée)
     {
         HttpClient client = new();
+
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Barrage/idSecteur=1"));
         request.Content = JsonContent.Create(barrageCrée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            isObjetNonValideWarningVisible = true;
+        }
     }
     async Task OnSubmitBarrageModifié(Barrage barrageModifié)
     {
         HttpClient client = new();
+
         var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/Barrage/idSecteur=1"));
         request.Content = JsonContent.Create(barrageModifié);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
-        Console.WriteLine(response.StatusCode);
+        if (response.IsSuccessStatusCode == false)
+        {
+            isObjetNonValideWarningVisible = true;
+        }
     }
     async Task OnSubmitCapteurCrée(Capteur capteurCrée)
     {
+        HttpClient client = new();
+
         if (barrageCapteur!.AddCapteur(capteurCrée) == false)
         {
-            isVisible = true;
+            isObjetNonValideWarningVisible = true;
             return; 
         }
-        HttpClient client = new();
+
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
         request.Content = JsonContent.Create(capteurCrée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            isObjetNonValideWarningVisible = true;
+        }
     }
     async Task OnSubmitCapteurModifié(Capteur capteurModifié)
     {
-        if (capteurModifié.Principal == true)
+        HttpClient client = new();
+
+        foreach (Capteur capteur in barrageCapteur!.Capteurs)
         {
-            foreach (Capteur capteur in barrageCapteur!.Capteurs)
+            if (capteur.Libellé == capteurModifié.Libellé)
             {
-                if (capteur.Libellé != capteurModifié.Libellé && capteur.Principal == true)
-                {
-                    isVisible = true;
-                    return;
-                }
+                barrageCapteur.Capteurs.Remove(capteur);
             }
         }
-        HttpClient client = new();
+
+        if (barrageCapteur.AddCapteur(capteurModifié) == false)
+        {
+            isObjetNonValideWarningVisible = true;
+            return;
+        }
+
         var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
         request.Content = JsonContent.Create(capteurModifié);
         var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            isObjetNonValideWarningVisible = true;
+        }
     }
     async Task OnSubmitCoteCrée(CoteExploitation coteCrée)
     {
         HttpClient client = new();
+
+        if (barrageCote!.AddCote(coteCrée) == false)
+        {
+            isObjetNonValideWarningVisible = true;
+            return;
+        }
+
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
         request.Content = JsonContent.Create(coteCrée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            isObjetNonValideWarningVisible = true;
+        }
     }
     async Task OnSubmitCoteModifiée(CoteExploitation coteModifiée)
     {
         HttpClient client = new();
+
+        foreach (CoteExploitation cote in barrageCote!.CotesExploitation)
+        {
+            if (cote.Libellé == coteModifiée.Libellé)
+            {
+                barrageCote.CotesExploitation.Remove(cote);
+            }
+        }
+        if (barrageCote.AddCote(coteModifiée) == false)
+        {
+            isObjetNonValideWarningVisible = true;
+            return;
+        }
+
         var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
         request.Content = JsonContent.Create(coteModifiée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            isObjetNonValideWarningVisible = true;
+        }
     }
 
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args){}
-    void CapteurBarrageFiltre() { capteursFiltre = barrageCapteur!.Capteurs; capteurModifié = capteursFiltre[0]; }
+
     void CoteBarrageFiltre() { cotesFiltre = barrageCote!.CotesExploitation; coteModifiée = cotesFiltre[0]; }
+    void CapteurBarrageFiltre() { capteursFiltre = barrageCapteur!.Capteurs; capteurModifié = capteursFiltre[0]; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -580,8 +637,6 @@ else
         if (authResponse.IsSuccessStatusCode)
         {
             authRet = await authResponse.Content.ReadFromJsonAsync<AuthLDAP_ADReturnObject>().ConfigureAwait(false);
-            Console.WriteLine(authRet!.Auth);
-            Console.WriteLine(authRet.State);
         }
 
         var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
@@ -590,38 +645,43 @@ else
         {
             barrages = await response.Content.ReadFromJsonAsync<List<Barrage>>().ConfigureAwait(false);
         }
+
         request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeBarrage/"));
         response = await client.SendAsync(request).ConfigureAwait(false);
-
         if (response.IsSuccessStatusCode)
         {
             typesBarrage = await response.Content.ReadFromJsonAsync<List<TypeBarrage>>().ConfigureAwait(false);
         }
+
         request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeCapteur/"));
         response = await client.SendAsync(request).ConfigureAwait(false);
-
         if (response.IsSuccessStatusCode)
         {
             typesCapteur = await response.Content.ReadFromJsonAsync<List<TypeCapteur>>().ConfigureAwait(false);
         }
+
         request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeCoteExploitation/"));
         response = await client.SendAsync(request).ConfigureAwait(false);
-
         if (response.IsSuccessStatusCode)
         {
             typesCote = await response.Content.ReadFromJsonAsync<List<TypeCoteExploitation>>().ConfigureAwait(false);
         }
+
         foreach(Barrage barrage in barrages!)
         {
             foreach(Capteur capteur in barrage.Capteurs)
             {
-                capteurs!.Add(capteur);
+                capteurs.Add(capteur);
             }
             foreach(CoteExploitation cote in barrage.CotesExploitation)
             {
-                cotes!.Add(cote);
+                cotes.Add(cote);
             }
         }
-        isLoginVisible = authRet!.Auth == false ? true : false;
+
+        if (authRet != null)
+        {
+            isLoginWarningVisible = authRet!.Auth == false ? true : false;
+        }
     }
 }

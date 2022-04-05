@@ -8,15 +8,15 @@ namespace Barrage_Model
 		public TypeBarrage? Type { get; set; }
 		public List<Capteur> Capteurs { get; set; } = new();
 		public List<CoteExploitation> CotesExploitation { get; set; } = new();
-		public decimal Latitude { get; set; }
-		public decimal Longitude { get; set; }
-		public decimal Altitude { get; set; }
+		public string? Usage { get; set; }
 		public int Hauteur { get; set; }
 		public int Longueur { get; set; }
 		public int VolumeRetenu { get; set; }
 		public int SurfaceRetenue { get; set; }
 		public int SurfaceBassin { get; set; }
-		public string? Usage { get; set; }
+		public decimal Latitude { get; set; }
+		public decimal Longitude { get; set; }
+		public decimal Altitude { get; set; }
 		#endregion propriétés publiques
 
 		#region constructeurs
@@ -51,26 +51,23 @@ namespace Barrage_Model
 			Capteurs.Add(newCapteur);
 			return true;
 		}
-		public void AddCote(CoteExploitation newCote)
+		public bool AddCote(CoteExploitation newCote)
 		{
 			foreach (CoteExploitation cote in CotesExploitation)
 			{
-				if (cote.Id == newCote.Id)
-				{
-					throw new ArgumentException(nameof(Barrage) + " " + nameof(AddCote) + ": Id déjà présent.");
-				}
 				if (cote.Type == newCote.Type && cote.Seuil == newCote.Seuil)
 				{
-					throw new ArgumentException(nameof(Barrage) + " " + nameof(AddCote) + ": Il existe déjà une cote avec le meme seuil");
+					return false;
 				}
 				if (cote.Type == newCote.Type &&
 					(cote.Seuil > newCote.Seuil && cote.Criticité <= newCote.Criticité ||
 					cote.Seuil < newCote.Seuil && cote.Criticité >= newCote.Criticité))
 				{
-					throw new ArgumentException(nameof(Barrage) + " " + nameof(AddCote) + ": Cote invalide. Verifiez les valeurs de cette cote par rapport aux autres.");
+					return false;
 				}
 			}
 			CotesExploitation.Add(newCote);
+			return true;
 		}
 		#endregion methods
 	}

@@ -43,27 +43,13 @@ namespace Barrage_API.Controllers
 			}
 		}
 
-		[HttpGet("idSecteur={idSecteur}")]
-		public async Task<IActionResult> GetBarrageBySecteur(int idSecteur)
+		[HttpPut]
+		[HttpPost]
+		public async Task<IActionResult> StoreBarrage([FromBody] Barrage barrage)
 		{
 			try
 			{
-				return Ok(await BarrageDAO.GetBySecteurAsync(idSecteur).ConfigureAwait(false));
-			}
-			catch (Exception ex)
-			{
-				logger.LogError(ex.ToString());
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-			}
-		}
-
-		[HttpPut("idSecteur={idSecteur}")]
-		[HttpPost("idSecteur={idSecteur}")]
-		public async Task<IActionResult> StoreBarrage([FromBody] Barrage barrage, int idSecteur)
-		{
-			try
-			{
-				return Ok(await BarrageDAO.StoreAsync(barrage, idSecteur));
+				return Ok(await BarrageDAO.StoreAsync(barrage));
 			}
 			catch (Exception ex)
 			{
