@@ -47,59 +47,65 @@
 
 ### Hiérarchie des tables
 
-  barrages:
-        -> id
-        -> id_type_barrage
-          => Table types_barrage -> id
-        -> nom
-        -> usage
-        ....
+  barrages:  
+        -> id  
+        -> id_type_barrage  
+          => Table types_barrage -> id  
+        -> nom ####unique  
+        -> usage  
+        ....  
         
- capteurs:
-        -> id
-        -> id_type_capteur
-          => types_capteur -> id
-        -> id_barrage
-          => barrages -> id
-        -> nom
-        -> est_actif
-        -> est_principal
+ capteurs:  
+        -> id  
+        -> id_type_capteur  
+          => types_capteur -> id  
+        -> id_barrage *unique en pair avec le nom*  
+          => barrages -> id  
+        -> nom *unique en pair avec l'id du barrage*  
+        -> est_actif  
+        -> est_principal  
         
-  cotes_exploitation:
-        -> id
-        -> id_type_cote_exploitation
-          => types_cote_exploitation -> id
-        -> id_barrage
-          => barrages -> id
-        -> seuil
-        -> criticité
-        -> libellé
+  cotes_exploitation:  
+        -> id  
+        -> id_type_cote_exploitation  
+          => types_cote_exploitation -> id  
+        -> id_barrage *unique en pair avec le libelle*  
+          => barrages -> id  
+        -> seuil  
+        -> criticité  
+        -> libellé *unique en pair avec l'id du barrage*  
         
-   types_barrage:
-        -> id
-        -> libellé
+   types_barrage:  
+        -> id  
+        -> libellé  
         
-   types_capteur:
-        -> id
-        -> libellé
+   types_capteur:  
+        -> id  
+        -> libellé  
         
-   types_cote_exploitation:
-        -> id
-        -> libellé
+   types_cote_exploitation:  
+        -> id  
+        -> libellé  
         
    mesures:
-        -> id_barrage
-          => barrages -> id
-        -> id_capteur
-          => capteurs -> id
-        -> gdh
-        -> valeur
-        -> debit_sortant
-        -> debit_entrant
-        -> volume
+        -> id_barrage  
+          => barrages -> id  
+        -> id_capteur *unique en pair avec le gdh*  
+          => capteurs -> id  
+        -> gdh ####unique en pair avec l'id capteur  
+        -> valeur  
+        -> debit_sortant  
+        -> debit_entrant  
+        -> volume  
         
-   mesures_temperature:
-        -> id_capteur
-          => capteurs -> id
-        -> gdh
-        -> valeur
+   mesures_temperature:  
+        -> id_capteur *unique en paire avec le gdh*  
+          => capteurs -> id  
+        -> gdh *unique en paire avec l'id capteur*  
+        -> valeur  
+        
+        
+ ### Vues
+ 
+   Il y a une vue calculée dans la base : mesures jour.
+    Elle calcule automatiquement la pluviometrie journaliere de chaque capteur de type pluvio (id_type_capteur == 2)
