@@ -34,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthLDAP_ADAPI", "AuthLDAP_
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Barrage API", "Barrage API", "{2A030B0E-85BE-4C83-A518-81B4E0D8DAFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service Température", "Service Temp\Service Température.csproj", "{ACD451AE-2F28-4C9C-9782-41949446F77F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service Température", "Service Température\Service Température.csproj", "{86A7FF9D-8245-403F-99EF-8E82BCD781EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,10 +66,10 @@ Global
 		{D84FCEA7-995E-437E-8B2E-2CC80D036D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D84FCEA7-995E-437E-8B2E-2CC80D036D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D84FCEA7-995E-437E-8B2E-2CC80D036D75}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ACD451AE-2F28-4C9C-9782-41949446F77F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ACD451AE-2F28-4C9C-9782-41949446F77F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ACD451AE-2F28-4C9C-9782-41949446F77F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ACD451AE-2F28-4C9C-9782-41949446F77F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86A7FF9D-8245-403F-99EF-8E82BCD781EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A7FF9D-8245-403F-99EF-8E82BCD781EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86A7FF9D-8245-403F-99EF-8E82BCD781EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86A7FF9D-8245-403F-99EF-8E82BCD781EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
