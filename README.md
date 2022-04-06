@@ -8,13 +8,13 @@
   
   2- L'API Barrage est appelée par:
     -> Le Service FTP (3) toutes les 5 minutes pour inserer les nouvelles données
-    -> Le Service Temp (4) toutes les 5 minutes pour inserer les nouvelles données
+    -> Le Service Température (4) toutes les 5 minutes pour inserer les nouvelles données
     -> Le site Web (5) à chaque chargement de page nécéssitant des données conservées en base
     
  3- Le Service FTP est chargé de traduire les données stockés sur le fichier .csv alimenté par le service de prévention des crues et mis à disposition sur
     un serveur FTP (Toutes les infos se trouvent dans le fichier InfosFTP.cs)
     
- 4- Le Service Temp est chargé de recupérer les données depuis l'API Du logiciel ThermotrackWebserve via une API KEY trouvable dans le fichier worker.cs
+ 4- Le Service Température est chargé de recupérer les données depuis l'API Du logiciel ThermotrackWebserve via une API KEY trouvable dans le fichier worker.cs
  5- Le Site Web affiche les données et l'état des barrages et des capteurs présents dans la base de données.
  
 ### Comment ajouter un utilisateur
