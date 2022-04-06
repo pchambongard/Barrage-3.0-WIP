@@ -51,7 +51,7 @@
         -> id  
         -> id_type_barrage  
           => Table types_barrage -> id  
-        -> nom ####unique  
+        -> nom *unique*
         -> usage  
         ....  
         
