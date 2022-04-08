@@ -38,18 +38,18 @@ namespace Service_Temp
 		{
 			HttpClient client = new();
 			List<Capteur>? capteurs = new();
-			List<MesureTempérature> mesures = new();
+			List<MesureTempÃ©rature> mesures = new();
 			DateTime start = DateTime.Now.AddDays(-1).ToLocalTime();
 			DateTime end = DateTime.Now.ToLocalTime();
 
-			var requestCapteur = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Capteur"));
+			var requestCapteur = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Capteur"));
 			var responseCapteur = await client.SendAsync(requestCapteur).ConfigureAwait(false);
 			if (responseCapteur.IsSuccessStatusCode)
 			{
 				capteurs = await responseCapteur.Content.ReadFromJsonAsync<List<Capteur>>().ConfigureAwait(false);
 			}
 
-			var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://www.thermotrack-webserve.com/API/get_api.php?method=equip_list&api_key=532c-16a171e&format=xml"));
+			var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.thermListRequest));
 			var response = await client.SendAsync(request).ConfigureAwait(false);
 			if (response.IsSuccessStatusCode && response.Content != null)
 			{
@@ -61,8 +61,7 @@ namespace Service_Temp
 					_logger.LogInformation("There is : " + nodes!.Count.ToString() + "sondes found");
 					foreach (XmlNode node in nodes!)
 					{
-						var uri = new Uri("https://www.thermotrack-webserve.com/API/get_api.php?method=equip_data&api_key=532c-16a171e&equip_id="
-							+ node.ChildNodes[0]!.InnerText + "&date_start=" + start.ToString("yyyy'-'MM'-'dd") + "&date_end=" + end.ToString("yyyy'-'MM'-'dd") + "&format=xml");
+						var uri = new Uri(Infos.thermDataRequest + node.ChildNodes[0]!.InnerText + "&date_start=" + start.ToString("yyyy'-'MM'-'dd") + "&date_end=" + end.ToString("yyyy'-'MM'-'dd") + "&format=xml");
 						var requestData = new HttpRequestMessage(HttpMethod.Get, uri);
 						var responseData = await client.SendAsync(requestData).ConfigureAwait(false);
 
@@ -95,7 +94,7 @@ namespace Service_Temp
 				if (mesures.Count > 0)
 				{
 					_logger.LogInformation(mesures.Count.ToString());
-					var requestPost = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5254/api/MesureTemperature/")
+					var requestPost = new HttpRequestMessage(HttpMethod.Post, Infos.barrageAPI + "/MesureTemperature/")
 					{
 						Content = JsonContent.Create(mesures)
 					};
@@ -114,7 +113,7 @@ namespace Service_Temp
 		{
 			foreach (Capteur c in capteurs)
 			{
-				if (capteur == c.Libellé)
+				if (capteur == c.LibellÃ©)
 				{
 					return c.Id;
 				}

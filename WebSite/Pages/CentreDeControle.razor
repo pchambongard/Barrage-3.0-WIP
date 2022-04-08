@@ -74,7 +74,7 @@ else
     {
         HttpClient client = new();
         List<Barrage>? barrages = new();
-        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+        var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/"));
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
         if (response.IsSuccessStatusCode)
@@ -91,7 +91,7 @@ else
             {
                 if (capteur.Type!.Id == 3)
                 {
-                    var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/MesureTemperature/last/idCapteur=" + capteur.Id));
+                    var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/MesureTemperature/last/idCapteur=" + capteur.Id));
                     var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
                     if (capteurResponse.IsSuccessStatusCode)
                     {
@@ -106,7 +106,7 @@ else
                 {
                     if (capteur.Principal == true)
                     {
-                        var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                        var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
                         var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
                         if (capteurResponse.IsSuccessStatusCode)
                         {
@@ -120,7 +120,7 @@ else
                     }
                     else
                     {
-                        var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                        var capteurRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Mesure/last/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
                         var capteurResponse = await client.SendAsync(capteurRequest).ConfigureAwait(false);
                         if (capteurResponse.IsSuccessStatusCode)
                         {

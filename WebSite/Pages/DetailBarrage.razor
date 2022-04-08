@@ -164,7 +164,7 @@
 
     protected string Format (object value) { return (decimal.Round(Convert.ToDecimal(value), 3)).ToString(); }
 
-    protected void Reload() { LimniChart.Reload(); PluvioChart.Reload(); TempChart.Reload(); DebitChart.Reload(); PluvioQuotidienneChart.Reload(); }
+    protected void Reload() { LimniChart.Reload(); DebitChart.Reload(); PluvioChart.Reload(); PluvioQuotidienneChart.Reload(); TempChart.Reload(); }
 
     protected void OnClickAll()
     {
@@ -260,7 +260,7 @@
         MesureTempCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Temp");
         busy = false;
     }
-    protected override async Task OnParametersSetAsync() { await SetChart(); chartView.IsLoaded = true; }
+    protected override async Task OnParametersSetAsync() { await SetChart();}
 
     protected async Task SetChart()
     {
@@ -268,7 +268,7 @@
         chartView.SetDate(date1, date2);
 
         HttpClient client = new();
-        var getBarrageByIdRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/idBarrage=" + Id));
+        var getBarrageByIdRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/idBarrage=" + Id));
         var getBarrageByIdResponse = await client.SendAsync(getBarrageByIdRequest).ConfigureAwait(false);
         barrage = await getBarrageByIdResponse.Content.ReadFromJsonAsync<Barrage>().ConfigureAwait(false);
 
@@ -281,7 +281,7 @@
             {
                 if(capteur.Type!.Id == 1)
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                    var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Mesure/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
                     request.Content = JsonContent.Create(chartView.StartEnd);
                     var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -293,7 +293,7 @@
                 }
                 else if (capteur.Type!.Id == 2)
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Mesure/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
+                    var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Mesure/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
                     request.Content = JsonContent.Create(chartView.StartEnd);
                     var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -303,7 +303,7 @@
                         chartView.PluvioItems.Add(new PluvioItem(capteur, mesures!));
                     }
 
-                    request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/MesurePluvioQuotidienne/idCapteur=" + capteur.Id));
+                    request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/MesurePluvioQuotidienne/idCapteur=" + capteur.Id));
                     request.Content = JsonContent.Create(chartView.StartEnd);
                     response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -314,7 +314,7 @@
                 }
                 else if (capteur.Type!.Id == 3)
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/MesureTemperature/idCapteur=" + capteur.Id));
+                    var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/MesureTemperature/idCapteur=" + capteur.Id));
                     request.Content = JsonContent.Create(chartView.StartEnd);
                     var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -327,5 +327,6 @@
             }
         }
         Reload();
+        chartView.IsLoaded = true; 
     }
 }

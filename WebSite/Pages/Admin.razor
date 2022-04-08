@@ -1,5 +1,6 @@
 ﻿@using AuthLDAP_AD_Model
 @using Barrage_Model
+@using WebSite
 
 @page "/admin"
 
@@ -482,7 +483,7 @@ else
     {
         HttpClient client = new();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Barrage/idSecteur=1"));
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri(Infos.barrageAPI + "Barrage/idSecteur=1"));
         request.Content = JsonContent.Create(barrageCrée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -495,7 +496,7 @@ else
     {
         HttpClient client = new();
 
-        var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/Barrage/idSecteur=1"));
+        var request = new HttpRequestMessage(HttpMethod.Put, new Uri(Infos.barrageAPI + "/Barrage/idSecteur=1"));
         request.Content = JsonContent.Create(barrageModifié);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -514,7 +515,7 @@ else
             return; 
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri(Infos.barrageAPI + "/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
         request.Content = JsonContent.Create(capteurCrée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -541,7 +542,7 @@ else
             return;
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
+        var request = new HttpRequestMessage(HttpMethod.Put, new Uri(Infos.barrageAPI + "/Capteur/idBarrage=" + barrageCapteur!.Id.ToString()));
         request.Content = JsonContent.Create(capteurModifié);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -560,7 +561,7 @@ else
             return;
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri(Infos.barrageAPI + "/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
         request.Content = JsonContent.Create(coteCrée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -586,7 +587,7 @@ else
             return;
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Put, new Uri("http://localhost:5254/api/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
+        var request = new HttpRequestMessage(HttpMethod.Put, new Uri(Infos.barrageAPI + "/CoteExploitation/idBarrage=" + barrageCote!.Id.ToString()));
         request.Content = JsonContent.Create(coteModifiée);
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
@@ -604,7 +605,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         HttpClient client = new();
-        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/idBarrage=1"));
+        var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/idBarrage=1"));
         var response = await client.SendAsync(request).ConfigureAwait(false);
 
         if (response.IsSuccessStatusCode)
@@ -623,15 +624,13 @@ else
     {
         HttpClient client = new();
         List<string> infos = new();
-        string searchBase = "LDAP://auth.intra.cg30.fr:389/DC=intra,DC=cg30,DC=fr";
-        string filter = "memberOf=CN=BARRAGE,OU=Globaux-Fonctionnels,OU=Groupes-globaux,OU=CG30-Groupes,OU=CG30-Usr-Grp,DC=intra,DC=cg30,DC=fr";
 
-        infos.Add(searchBase);
+        infos.Add(Infos.authSearchBase);
         infos.Add(args.Username);
         infos.Add(args.Password);
-        infos.Add(filter);
+        infos.Add(Infos.authFilter);
 
-        var authRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5114/api/Session/"));
+        var authRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.authldapadAPI));
         authRequest.Content = JsonContent.Create(infos);
         var authResponse = await client.SendAsync(authRequest);
         if (authResponse.IsSuccessStatusCode)
@@ -639,28 +638,28 @@ else
             authRet = await authResponse.Content.ReadFromJsonAsync<AuthLDAP_ADReturnObject>().ConfigureAwait(false);
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+        var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/"));
         var response = await client.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
             barrages = await response.Content.ReadFromJsonAsync<List<Barrage>>().ConfigureAwait(false);
         }
 
-        request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeBarrage/"));
+        request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/TypeBarrage/"));
         response = await client.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
             typesBarrage = await response.Content.ReadFromJsonAsync<List<TypeBarrage>>().ConfigureAwait(false);
         }
 
-        request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeCapteur/"));
+        request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/TypeCapteur/"));
         response = await client.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
             typesCapteur = await response.Content.ReadFromJsonAsync<List<TypeCapteur>>().ConfigureAwait(false);
         }
 
-        request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/TypeCoteExploitation/"));
+        request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/TypeCoteExploitation/"));
         response = await client.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {

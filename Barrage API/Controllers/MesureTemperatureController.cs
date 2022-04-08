@@ -20,6 +20,8 @@ namespace Service_Température.Controllers
 		{
 			try
 			{
+				logger.LogInformation(dates[0].ToString());
+				logger.LogInformation(dates[1].ToString());
 				if (dates.Count == 0)
 				{
 					dates[1] = DateTime.Now;

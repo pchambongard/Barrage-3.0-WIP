@@ -39,12 +39,6 @@ namespace Service_FTP
 		{
 			Thread.Sleep(TimeSpan.FromSeconds(30));
 
-			if (IsDBAccessible().Result == false)
-			{
-				_logger.LogInformation("Base de donnée non accessible: " + DateTime.Now.ToString());
-				return;
-			}
-
 			WebClient client = new();
 			HttpClient httpClient = new();
 
@@ -56,7 +50,7 @@ namespace Service_FTP
 			_logger.LogInformation("Converting Data...");
 			List<Mesure> mesuresLimni = await CsvToMesure.CsvConvertToMesureLimni(InfosFTP.DownloadLimniPath);
 			_logger.LogInformation("Storing new data. " + DateTime.Now.ToString());
-			var request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Mesure/"))
+			var request = new HttpRequestMessage(HttpMethod.Post, new Uri(Infos.barrageAPI + "/Mesure/"))
 			{
 				Content = JsonContent.Create(mesuresLimni)
 			};
@@ -68,34 +62,12 @@ namespace Service_FTP
 			_logger.LogInformation("Converting Data...");
 			List<Mesure> mesuresPluvio = await CsvToMesure.CsvConvertToMesurePluvio(InfosFTP.DownloadPluvioPath);
 			_logger.LogInformation("Storing new data. " + DateTime.Now.ToString());
-			request = new HttpRequestMessage(HttpMethod.Post, new Uri("http://localhost:5254/api/Mesure/"))
+			request = new HttpRequestMessage(HttpMethod.Post, new Uri(Infos.barrageAPI + "/Mesure/"))
 			{
 				Content = JsonContent.Create(mesuresPluvio)
 			};
 			response = await httpClient.SendAsync(request).ConfigureAwait(false);
 			_logger.LogInformation("Done. Status:  " + response.StatusCode + ". " + DateTime.Now.ToString());
-		}
-		public async Task<bool> IsDBAccessible()
-		{
-			try
-			{
-				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
-				await connection.OpenAsync().ConfigureAwait(false);
-				await using NpgsqlCommand commande = new()
-				{
-					Connection = connection,
-					CommandText = "SELECT * from mesures LIMIT 1;"
-				};
-				await using NpgsqlDataReader reader = commande.ExecuteReader();
-
-				_logger.LogInformation("DB is accessible");
-				return true;
-			}
-			catch
-			{
-				_logger.LogInformation("DB is not accessible, retrying in 5 minutes");
-				return false;
-			}
 		}
 	}
 }

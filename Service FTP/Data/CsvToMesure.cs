@@ -15,7 +15,7 @@ namespace Service_FTP.Data
 			List<Mesure> mesuresFilter = new();
 
 			HttpClient client = new();
-			var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+			var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/"));
 			var response = await client.SendAsync(request).ConfigureAwait(false);
 
 			if (response.IsSuccessStatusCode)
@@ -75,7 +75,7 @@ namespace Service_FTP.Data
 			List<Barrage>? barrages = new();
 
 			HttpClient client = new();
-			var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+			var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/"));
 			var response = await client.SendAsync(request).ConfigureAwait(false);
 
 			if (response.IsSuccessStatusCode)

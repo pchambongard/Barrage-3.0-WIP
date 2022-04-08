@@ -1,5 +1,6 @@
 ﻿using Barrage_Model;
 using Npgsql;
+using Barrage_API;
 
 namespace Barrage_API.DAL
 {
@@ -9,7 +10,7 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new(Infos.dbConn);
 
 				await connection.OpenAsync().ConfigureAwait(false);
 
@@ -54,7 +55,7 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new(Infos.dbConn);
 
 				await connection.OpenAsync().ConfigureAwait(false);
 
@@ -104,7 +105,7 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new(Infos.dbConn);
 
 				await connection.OpenAsync().ConfigureAwait(false);
 
@@ -152,7 +153,7 @@ namespace Barrage_API.DAL
 		{
 			try
 			{
-				await using NpgsqlConnection connection = new("Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false");
+				await using NpgsqlConnection connection = new(Infos.dbConn);
 
 				await connection.OpenAsync().ConfigureAwait(false);
 

@@ -1,0 +1,49 @@
+version: "3.9"
+
+volumes:
+  nginx-logs:
+
+networks:
+  barrage-network:
+
+services:
+  BarrageAPI:
+    image: "barrageapi"
+    restart: always
+    networks:
+      - barrage-network
+
+  Auth_LDAP_AD_API:
+    image: authldapadapi
+    restart: always
+    networks:
+      - barrage-network
+    
+  ServiceFTP:
+    image: serviceftp
+    restart: always
+    networks:
+      - barrage-network
+
+  ServiceTemperature:
+    image: servicetemperature
+    restart: always
+    networks:
+      - barrage-network
+  barrageV3: 
+    image: barragev3
+    restart: always
+    networks:
+      - barrage-network
+  
+  proxy-nginx:
+    restart: always
+    build:
+        context: ./nginx
+        dockerfile: dockerfile
+    ports:
+      - 4242:443
+    volumes:
+      - nginx-logs:/etc/nginx/logs
+    networks:
+      - barrage-network

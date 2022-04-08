@@ -14,29 +14,13 @@ namespace Barrage_API.Controllers
 		{
 			this.logger = logger;
 		}
-
-		[HttpGet("idBarrage={idBarrage}")]
-		public async Task<IActionResult> GetMesureBetweenByBarrage([FromBody] List<DateTime> dates, int idBarrage)
-		{
-			try
-			{
-				if (dates.Count == 0)
-				{
-					dates[1] = DateTime.Now;
-				}
-				return Ok(await MesureDAO.GetMesureBetweenByBarrage(dates[0], dates[1], idBarrage).ConfigureAwait(false));
-			}
-			catch (Exception ex)
-			{
-				logger.LogError(ex.ToString());
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-			}
-		}
 		[HttpGet("idBarrage={idBarrage}/idCapteur={idCapteur}")]
 		public async Task<IActionResult> GetMesureBetweenByCapteur([FromBody] List<DateTime> dates, int idBarrage, int idCapteur)
 		{
 			try
 			{
+				logger.LogInformation(dates[0].ToString());
+				logger.LogInformation(dates[1].ToString());
 				if (dates.Count == 0)
 				{
 					dates[1] = DateTime.Now;

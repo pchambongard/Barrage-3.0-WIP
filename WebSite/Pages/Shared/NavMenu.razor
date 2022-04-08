@@ -56,7 +56,7 @@
     {
         HttpClient client = new();
 
-        var getBarragesRequest = new HttpRequestMessage(HttpMethod.Get, new Uri("http://localhost:5254/api/Barrage/"));
+        var getBarragesRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/"));
         var getBarragesResponse = await client.SendAsync(getBarragesRequest).ConfigureAwait(false);
         if (getBarragesResponse.IsSuccessStatusCode)
         {
