@@ -19,8 +19,7 @@ namespace Service_FTP
 			WaitStart();
 
 			TimerCallback timerCallback = new(DownloadFileFTP);
-			Timer timer = new(timerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
-
+			using Timer timer = new(timerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				await Task.Delay(1000, stoppingToken);

@@ -28,7 +28,7 @@ namespace Service_FTP.Data
 				string[] values = line.Split(';');
 				Mesure mesure = new();
 
-				mesure.Date = DateTime.Parse(values[0]).ToLocalTime();
+				mesure.Date = DateTime.Parse(values[0], new CultureInfo("fr-FR")).ToLocalTime();
 				mesure.IdBarrage = ConvertBarrageFTPToDB(Convert.ToString(values[1]), barrages!);
 				mesure.IdCapteur = ConvertCapteurFTPToDB(Convert.ToString(values[2]), barrages!.First(barrage => barrage.Id == mesure.IdBarrage).Capteurs);
 				mesure.Valeur = Convert.ToDecimal(values[3], CultureInfo.InvariantCulture);
@@ -88,7 +88,7 @@ namespace Service_FTP.Data
 				string[] values = line.Split(';');
 				Mesure mesure = new();
 
-				mesure.Date = DateTime.Parse(values[0]).ToLocalTime();
+				mesure.Date = DateTime.Parse(values[0], new CultureInfo("fr-FR")).ToLocalTime();
 				mesure.IdBarrage = ConvertBarrageFTPToDB(Convert.ToString(values[1]), barrages!);
 				mesure.IdCapteur = ConvertCapteurFTPToDB(Convert.ToString(values[2]), barrages!.First(barrage => barrage.Id == mesure.IdBarrage).Capteurs);
 				mesure.Valeur = Convert.ToDecimal(values[3], CultureInfo.InvariantCulture);
@@ -113,7 +113,7 @@ namespace Service_FTP.Data
 			int ret = 0;
 			foreach (Capteur capteurDB in capteurs)
 			{
-				if (capteurDB.Libellé == capteur)
+				if (capteurDB.Libellé!.Contains(capteur))
 				{
 					ret = capteurDB.Id;
 				}

@@ -103,7 +103,7 @@ namespace Barrage_API.DAL
 
 				foreach (MesureTempérature Mesure in mesures)
 				{
-					string str = $"({Mesure.IdCapteur},'{Mesure.Date}',{decimal.Round(Mesure.Valeur, 3).ToString(CultureInfo.InvariantCulture)}),";
+					string str = $"({Mesure.IdCapteur},'{Mesure.Date.ToString("yyyy-MM-dd HH:mm:ss")}',{decimal.Round(Mesure.Valeur, 3).ToString(CultureInfo.InvariantCulture)}),";
 					commande += str;
 				}
 				char[] tmp = commande.ToCharArray();

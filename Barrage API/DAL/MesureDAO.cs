@@ -160,7 +160,7 @@ namespace Barrage_API.DAL
 
 				foreach (Mesure Mesure in mesures)
 				{
-					string str = $"({Mesure.IdBarrage},{Mesure.IdCapteur},'{Mesure.Date}'," +
+					string str = $"({Mesure.IdBarrage},{Mesure.IdCapteur},'{Mesure.Date.ToString("yyyy-MM-dd HH:mm:ss")}'," +
 						$"{decimal.Round(Mesure.Valeur, 3).ToString(CultureInfo.InvariantCulture)}, " +
 						$"{decimal.Round(Mesure.DebitSortant, 3).ToString(CultureInfo.InvariantCulture)}, " +
 						$"{decimal.Round(Mesure.DebitEntrant15mn, 3).ToString(CultureInfo.InvariantCulture)}, " +

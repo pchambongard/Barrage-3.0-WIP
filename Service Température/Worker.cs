@@ -18,8 +18,7 @@ namespace Service_Temp
 			WaitStart();
 
 			TimerCallback timerCallback = new(RequestData);
-			Timer timer = new(timerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
-
+			using Timer timer = new(timerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				await Task.Delay(1000, stoppingToken);
@@ -36,6 +35,8 @@ namespace Service_Temp
 		}
 		public async void RequestData(Object? Data)
 		{
+			Thread.Sleep(TimeSpan.FromSeconds(30));
+
 			HttpClient client = new();
 			List<Capteur>? capteurs = new();
 			List<MesureTempérature> mesures = new();
