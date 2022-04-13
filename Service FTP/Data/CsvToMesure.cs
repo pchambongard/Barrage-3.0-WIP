@@ -113,9 +113,20 @@ namespace Service_FTP.Data
 			int ret = 0;
 			foreach (Capteur capteurDB in capteurs)
 			{
-				if (capteurDB.Libellé!.Contains(capteur))
+				if (capteurDB.Libellé!.Contains(' '))
 				{
-					ret = capteurDB.Id;
+					string[] sub = capteurDB.Libellé!.Split(' ');
+					if (sub[0] == capteur)
+					{
+						ret = capteurDB.Id;
+					}
+				}
+				else
+				{
+					if (capteurDB.Libellé == capteur)
+					{
+						ret = capteurDB.Id;
+					}
 				}
 			}
 			return ret;
