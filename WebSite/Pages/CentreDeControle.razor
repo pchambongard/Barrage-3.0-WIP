@@ -1,6 +1,7 @@
 ﻿@using Barrage_Model
 @using WebSite
 @using WebSite.Views
+@using System.Globalization
 @page "/"
 
 <PageTitle>Centre De Controle</PageTitle>
@@ -72,6 +73,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        CultureInfo.CurrentUICulture = new CultureInfo("fr-FR");
+
         HttpClient client = new();
         List<Barrage>? barrages = new();
         var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/"));

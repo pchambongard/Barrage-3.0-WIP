@@ -41,7 +41,7 @@
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Hauteur (m)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:g}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:f}"/>
                 </RadzenChart>
             }
         </div>
@@ -64,7 +64,7 @@
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Debit (m3/s)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:g}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:f}"/>
                 </RadzenChart>
             }
         </div>
@@ -80,7 +80,7 @@
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Pluie (mm)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:g}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:f}"/>
                 </RadzenChart>
             }
         </div>
@@ -89,13 +89,10 @@
             {
                 <h3 style = "text-align:center">Pluviométrie Quotidienne</h3>
                 <RadzenChart @ref="PluvioQuotidienneChart" Style="margin-top: 30px">
-                        <RadzenLineSeries Smooth="true" Data="@pluvioQuotidienne" CategoryProperty="Date" ValueProperty="Valeur" Title="Pluvio Quotidienne">
-                            <RadzenMarkers MarkerType="MarkerType.Circle"/>
-                        </RadzenLineSeries>/>
+                    <RadzenColumnSeries Data="@pluvioQuotidienneView" CategoryProperty="Date" ValueProperty="Valeur" Title="Pluvio Quotidienne"/>
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Pluie Cumulée (mm)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:g}"/>
                 </RadzenChart>
             }
         </div>
@@ -111,7 +108,7 @@
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Température (°C)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:g}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:f}"/>
                 </RadzenChart>
             }
         </div>
@@ -120,14 +117,18 @@
             {
                 <RadzenButton Text="Export Limnimétrie" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickLimni/>
             }
+        </div>
+        <div class ="inner" align="center">
             @if (chartView.PluvioItems.Count > 0)
             {
                 <RadzenButton Text="Export Pluviométrie" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickPluvio/>
                 <RadzenButton Text="Export Pluviométrie Quotidienne" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickPluvioQuotidienne/>
             }
+        </div>
+        <div class ="inner" align="center">
             @if (chartView.TempItems.Count > 0)
             {
-                <RadzenButton Text="Export Température" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickTemp/>
+                <RadzenButton Text="Export Température (min-max / jour)" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickTemp/>
             }
         </div>
         <div class ="inner" align="center">
@@ -153,6 +154,7 @@
 
     private ChartView chartView = new();
     private List<Mesure>? pluvioQuotidienne = new();
+    private List<MesurePluvioQuotidienneView>? pluvioQuotidienneView = new();
     private Barrage? barrage = new();
     private bool busy = false;
 
@@ -260,12 +262,13 @@
         MesureTempCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Temp");
         busy = false;
     }
-    protected override async Task OnParametersSetAsync() { await SetChart();}
+    protected override async Task OnParametersSetAsync() { CultureInfo.CurrentUICulture = new CultureInfo("fr-FR"); await SetChart(); }
 
     protected async Task SetChart()
     {
         chartView = new();
         chartView.SetDate(date1, date2);
+        CultureInfo.CurrentUICulture = new CultureInfo("fr-FR");
 
         HttpClient client = new();
         var getBarrageByIdRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Barrage/idBarrage=" + Id));
@@ -310,6 +313,10 @@
                     if (response.IsSuccessStatusCode)
                     {
                         pluvioQuotidienne = await response.Content.ReadFromJsonAsync<List<Mesure>>().ConfigureAwait(false);
+                        foreach (Mesure mesure in pluvioQuotidienne!)
+                        {
+                            pluvioQuotidienneView!.Add(new MesurePluvioQuotidienneView(mesure.Date.ToString("M", new CultureInfo("fr-FR")), mesure.Valeur));
+                        }
                     }
                 }
                 else if (capteur.Type!.Id == 3)

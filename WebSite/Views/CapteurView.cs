@@ -1,4 +1,6 @@
-﻿namespace WebSite.Views
+﻿using System.Globalization;
+
+namespace WebSite.Views
 {
     public class CapteurView
 	{
@@ -16,7 +18,7 @@
 		{
 			Capteur = capteur;
 			Type = type;
-			Date = date.ToString();
+			Date = date.ToString("f", new CultureInfo("fr-FR"));
 			Valeur = valeur;
 		}
 	}
