@@ -2,6 +2,15 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using System;
+using System.IO;
+using System.Net;
+using System.Security.Permissions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Data;
+
 
 namespace WebSite.CSV
 {
@@ -35,7 +44,7 @@ namespace WebSite.CSV
 			DebitEntrant15mn = debitEntrant15mn;
 
 		}
-		public static void MesuresToCSV(List<MesureLimniCSV> mesures, string barrage, string type)
+		public static string MesuresToCSV(List<MesureLimniCSV> mesures, string barrage, string type)
 		{
 			mesures.Sort((x, y) => y.Date.CompareTo(x.Date));
 			barrage = barrage.Replace(" ", string.Empty);
@@ -49,6 +58,7 @@ namespace WebSite.CSV
 			using var writer = new StreamWriter(path);
 			using var csv = new CsvWriter(writer, config);
 			csv.WriteRecords(mesures);
+			return path;
 		}
 	}
 	public class MesurePluvioCSV
@@ -66,7 +76,7 @@ namespace WebSite.CSV
 			Date = date;
 			Valeur = valeur;
 		}
-		public static void MesuresToCSV(List<MesurePluvioCSV> mesures, string barrage, string type)
+		public static string MesuresToCSV(List<MesurePluvioCSV> mesures, string barrage, string type)
 		{
 			mesures.Sort((x, y) => y.Date.CompareTo(x.Date));
 			barrage = barrage.Replace(" ", string.Empty);
@@ -80,6 +90,7 @@ namespace WebSite.CSV
 			using var writer = new StreamWriter(path);
 			using var csv = new CsvWriter(writer, config);
 			csv.WriteRecords(mesures);
+			return path;
 		}
 	}
 	public class MesureTempCSV
@@ -98,7 +109,7 @@ namespace WebSite.CSV
 			ValeurMin = valeurMin;
 			ValeurMax = valeurMax;
 		}
-		public static void MesuresToCSV(List<MesureTempCSV> mesures, string barrage, string type)
+		public static string MesuresToCSV(List<MesureTempCSV> mesures, string barrage, string type)
 		{
 			mesures.Sort((x, y) => y.Date.CompareTo(x.Date));
 			barrage = barrage.Replace(" ", string.Empty);
@@ -112,6 +123,7 @@ namespace WebSite.CSV
 			using var writer = new StreamWriter(path);
 			using var csv = new CsvWriter(writer, config);
 			csv.WriteRecords(mesures);
+			return path;
 		}
 	}
 	public class MesurePluvioQuotidienneCSV
@@ -129,7 +141,7 @@ namespace WebSite.CSV
 			Date = date;
 			Valeur = valeur;
 		}
-		public static void MesuresToCSV(List<MesurePluvioQuotidienneCSV> mesures, string barrage, string type)
+		public static string MesuresToCSV(List<MesurePluvioQuotidienneCSV> mesures, string barrage, string type)
 		{
 			mesures.Sort((x, y) => y.Date.CompareTo(x.Date));
 			barrage = barrage.Replace(" ", string.Empty);
@@ -143,6 +155,7 @@ namespace WebSite.CSV
 			using var writer = new StreamWriter(path);
 			using var csv = new CsvWriter(writer, config);
 			csv.WriteRecords(mesures);
+			return path;
 		}
 	}
 }

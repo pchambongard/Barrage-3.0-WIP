@@ -4,6 +4,8 @@
 @using WebSite.Views
 @using WebSite
 @using Barrage_Model
+@using System.IO
+@inject IJSRuntime JS
 
 @page "/barrage/{Id}"
 
@@ -115,26 +117,26 @@
         <div class="inner" align="center">
             @if (chartView.LimniItems.Count > 0)
             {
-                <RadzenButton Text="Export Limnimétrie" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickLimni/>
+                <RadzenButton Text="Export Limnimétrie" Icon="save" Click=@OnClickLimni/>
             }
         </div>
         <div class ="inner" align="center">
             @if (chartView.PluvioItems.Count > 0)
             {
-                <RadzenButton Text="Export Pluviométrie" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickPluvio/>
-                <RadzenButton Text="Export Pluviométrie Quotidienne" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickPluvioQuotidienne/>
+                <RadzenButton Text="Export Pluviométrie" Icon="save" Click=@OnClickPluvio/>
+                <RadzenButton Text="Export Pluviométrie Quotidienne" Icon="save" Click=@OnClickPluvioQuotidienne/>
             }
         </div>
         <div class ="inner" align="center">
             @if (chartView.TempItems.Count > 0)
             {
-                <RadzenButton Text="Export Température (min-max / jour)" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickTemp/>
+                <RadzenButton Text="Export Température (min-max / jour)" Icon="save" Click=@OnClickTemp/>
             }
         </div>
         <div class ="inner" align="center">
             @if (chartView.LimniItems.Count > 0 || chartView.PluvioItems.Count > 0 || chartView.PluvioItems.Count > 0)
             {
-                <RadzenButton Text="Tout Exporter" Icon="save" IsBusy=@busy BusyText="Saving ..." Click=@OnClickAll ButtonStyle="ButtonStyle.Success"/>
+                <RadzenButton Text="Tout Exporter" Icon="save" Click=@OnClickAll ButtonStyle="ButtonStyle.Success"/>
             }
         </div>
     }
@@ -156,7 +158,6 @@
     private List<Mesure>? pluvioQuotidienne = new();
     private List<MesurePluvioQuotidienneView>? pluvioQuotidienneView = new();
     private Barrage? barrage = new();
-    private bool busy = false;
 
     private RadzenChart LimniChart = new();
     private RadzenChart DebitChart = new();
@@ -168,28 +169,25 @@
 
     protected void Reload() { LimniChart.Reload(); DebitChart.Reload(); PluvioChart.Reload(); PluvioQuotidienneChart.Reload(); TempChart.Reload(); }
 
-    protected void OnClickAll()
+    protected async void OnClickAll()
     {
-        busy = true;
         if (chartView.LimniItems.Count > 0)
         {
-            OnClickLimni();
+            await OnClickLimni();
         }
         if (chartView.PluvioItems.Count > 0)
         {
-            OnClickPluvio();
-            OnClickPluvioQuotidienne();
+            await OnClickPluvio();
+            await OnClickPluvioQuotidienne();
         }
         if (chartView.TempItems.Count > 0)
         {
-            OnClickTemp();
+            await OnClickTemp();
         }
-        busy = false;
     }
 
-    protected void OnClickLimni()
+    protected async Task OnClickLimni()
     {
-        busy = true;
         List<MesureLimniCSV> mesures = new();
         foreach (LimniItem item in chartView.LimniItems)
         {
@@ -208,12 +206,12 @@
                 }
             }
         }
-        MesureLimniCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Limni");
-        busy = false;
+        string path = MesureLimniCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Limni");
+        FileStream stream = File.Open(path, FileMode.Open);
+        await DownloadFileFromStream(stream, Path.GetFileName(path));
     }
-    protected void OnClickPluvio()
+    protected async Task OnClickPluvio()
     {
-        busy = true;
         List<MesurePluvioCSV> mesures = new();
         foreach (PluvioItem item in chartView.PluvioItems)
         {
@@ -222,12 +220,12 @@
                 mesures.Add(new MesurePluvioCSV(barrage!.Libellé!, item.Capteur.Libellé!, mesure.Date, mesure.Valeur));
             }
         }
-        MesurePluvioCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Pluvio");
-        busy = false;
+        string path = MesurePluvioCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Pluvio");
+        FileStream stream = File.Open(path, FileMode.Open);
+        await DownloadFileFromStream(stream, Path.GetFileName(path));
     }
-    protected void OnClickPluvioQuotidienne()
+    protected async Task OnClickPluvioQuotidienne()
     {
-        busy = true;
         List<MesurePluvioQuotidienneCSV> mesures = new();
         foreach (PluvioItem item in chartView.PluvioItems)
         {
@@ -239,12 +237,12 @@
                 }
             }
         }
-        MesurePluvioQuotidienneCSV.MesuresToCSV(mesures, barrage!.Libellé!, "PluvioQuotidienne");
-        busy = false;
+        string path = MesurePluvioQuotidienneCSV.MesuresToCSV(mesures, barrage!.Libellé!, "PluvioQuotidienne");
+        FileStream stream = File.Open(path, FileMode.Open);
+        await DownloadFileFromStream(stream, Path.GetFileName(path));
     }
-    protected void OnClickTemp()
+    protected async Task OnClickTemp()
     {
-        busy = true;
         List<MesureTempCSV> mesures = new();
         foreach (TempItem item in chartView.TempItems)
         {
@@ -259,9 +257,16 @@
                 }
             }
         }
-        MesureTempCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Temp");
-        busy = false;
+        string path = MesureTempCSV.MesuresToCSV(mesures, barrage!.Libellé!, "Temp");
+        FileStream stream = File.Open(path, FileMode.Open);
+        await DownloadFileFromStream(stream, Path.GetFileName(path));
     }
+
+    protected async Task DownloadFileFromStream(Stream stream, string name)
+    {
+        await JS.InvokeVoidAsync("downloadFileFromStream", name, new DotNetStreamReference(stream));
+    }
+
     protected override async Task OnParametersSetAsync() { CultureInfo.CurrentUICulture = new CultureInfo("fr-FR"); await SetChart(); }
 
     protected async Task SetChart()
