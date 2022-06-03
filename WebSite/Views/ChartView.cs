@@ -17,7 +17,7 @@ namespace WebSite.Views
 			StartEnd.Add(date1);
 			StartEnd.Add(date2);
 
-			Step = (date2 - date1) / 6;
+			Step = (date2 - date1) / 5;
 		}
 	}
 

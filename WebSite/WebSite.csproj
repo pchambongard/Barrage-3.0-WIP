@@ -5,17 +5,18 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>WebSite</RootNamespace>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BlazorDownloadFile" Version="2.4.0.2" />
     <PackageReference Include="CsvHelper" Version="27.2.1" />
-    <PackageReference Include="Radzen.Blazor" Version="3.18.0" />
+    <PackageReference Include="Radzen.Blazor" Version="3.18.12" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Auth LDAP_AD Model\Auth LDAP_AD Model.csproj" />
     <ProjectReference Include="..\Barrage Model\Barrage Model.csproj" />
+    <ProjectReference Include="..\Service Température\Service Température.csproj" />
   </ItemGroup>
-
 </Project>

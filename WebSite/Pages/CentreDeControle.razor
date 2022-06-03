@@ -18,9 +18,9 @@ else
 		var link = "/barrage/" + barrage.Id;
         <RadzenCard>
             <NavLink class="nav-link" href="@link"> @barrage.Libellé </NavLink>
-            <div class= "wrapper">
-                <div class="first">
-                    <RadzenRadialGauge Style="width: 250px; height: 250px;">
+            <div style="display: flex;">
+                <div style="float: left;">
+                    <RadzenRadialGauge>
                         <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="@barrage.Step" Min=@barrage.Min Max=@barrage.Max TickPosition=GaugeTickPosition.Inside ShowTickLabels="true">
                                 <RadzenRadialGaugeScalePointer Value=@barrage.CapteurPrincipal!.Valeur Length="0.8" ShowValue=true>
                                     <Template Context="pointer">
@@ -35,15 +35,14 @@ else
                             </RadzenRadialGaugeScale>
                     </RadzenRadialGauge>
                 </div>
-                <div class="second">
-                    <RadzenDataGrid Style= "width: 1200px" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple"
-                        AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                        Data="@barrage.Capteurs" TItem="CapteurView" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <div style="float: right;">
+                    <RadzenDataGrid AllowColumnResize="true"AllowSorting="true" PageSize="5" AllowPaging="true"
+                    PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" Data="@barrage.Capteurs" TItem="CapteurView">
                         <Columns>
-                            <RadzenDataGridColumn TItem="CapteurView" Property="Capteur" Filterable="false" Title="Capteur" Width="175px" TextAlign="TextAlign.Center" />
-                            <RadzenDataGridColumn TItem="CapteurView" Property="Date" Filterable="false" Title="Date de la dernière mesure" Width="200px" TextAlign="TextAlign.Center" />
-                            <RadzenDataGridColumn TItem="CapteurView" Property="Valeur" Filterable="false" Title="Valeur" Width="75px" TextAlign="TextAlign.Center" />
-                            <RadzenDataGridColumn TItem="CapteurView" Property="DerniereCoteAtteinte" Filterable="false" Title="Dernière cote atteinte" Width="200px" TextAlign="TextAlign.Center" />
+                            <RadzenDataGridColumn TItem="CapteurView" Property="Capteur" Filterable="true" Title="Capteur" TextAlign="TextAlign.Center" />
+                            <RadzenDataGridColumn TItem="CapteurView" Property="Date" Filterable="true" Title="Date de la dernière mesure" TextAlign="TextAlign.Center" />
+                            <RadzenDataGridColumn TItem="CapteurView" Property="Valeur" Filterable="true" Title="Valeur" TextAlign="TextAlign.Center" />
+                            <RadzenDataGridColumn TItem="CapteurView" Property="DerniereCoteAtteinte" Filterable="true" Title="Dernière cote atteinte" TextAlign="TextAlign.Center" />
                         </Columns>
                     </RadzenDataGrid>
                 </div>
@@ -51,20 +50,6 @@ else
         </RadzenCard>
     }
 }
-
-<style>
-.wrapper {
-    overflow: hidden;
-}
-.first {
-    display: inline-block;
-    float:left;
-}
-.second {
-    display: inline-block;
-    overflow: hidden;
-}
-</style>
 
 @code
 {

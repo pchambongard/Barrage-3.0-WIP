@@ -9,16 +9,15 @@
 
 @page "/barrage/{Id}"
 
-<RadzenCard>
+@if (chartView.IsLoaded == false)
+{
+    <text>Loading...</text>
+}
+else
+{
+    <RadzenCard>
 
-    <h2 style = "text-align:center">@barrage!.Libellé</h2> 
-
-    @if (chartView.IsLoaded == false)
-    {
-        <text>Loading...</text>
-    }
-    else
-    {
+        <h2 style = "text-align:center">@barrage!.Libellé</h2> 
         <div align="left">
             <RadzenDatePicker Style="width: 15%" @bind-value=@date1 TValue="DateTime" ShowTime="true" ShowSeconds="true" HoursStep="1" MinutesStep="5" SecondsStep="10" DateFormat="dd/MM/yyyy HH:mm"/>
             <RadzenDatePicker Style="width: 15%" @bind-value=@date2 TValue="DateTime" ShowTime="true" ShowSeconds="true" HoursStep="1" MinutesStep="5" SecondsStep="10" DateFormat="dd/MM/yyyy HH:mm"/>
@@ -29,21 +28,27 @@
             {
                 <h3 style = "text-align:center">Limnimétrie</h3>
                 <RadzenChart @ref="LimniChart">
-                    @foreach (LimniItem item in chartView.LimniItems)
+                    @for (int index = 0; index < chartView.LimniItems.Count; index++)
                     {
-                        <RadzenLineSeries Smooth="true" Data="@item.Mesures" CategoryProperty="Date" ValueProperty="Valeur" Title="@item.Capteur.Libellé"/>
+                        var i = index;
+                        <RadzenLineSeries @ref=series[i] Smooth="true" Data="@chartView.LimniItems[i].Mesures" CategoryProperty="Date" ValueProperty="Valeur" Title="@chartView.LimniItems[i].Capteur.Libellé"/>
                     }
-                    @foreach (CoteExploitation cote in chartView.Barrage.CotesExploitation)
+@*                    @foreach (LimniItem item in chartView.LimniItems)
+                    {
+
+                        <RadzenLineSeries @ref="series[]" Smooth="true" Data="@item.Mesures" CategoryProperty="Date" ValueProperty="Valeur" Title="@item.Capteur.Libellé" Hidden="@item.Hidden"/>
+                    }*@
+                    @foreach (CoteExploitation cote in chartView.Barrage.CotesExploitation.OrderBy(c => c.Criticité))
                     {
                         List<Mesure> coteMesures = new();
                         coteMesures.Add(new(chartView.StartEnd[0], cote.Seuil));
                         coteMesures.Add(new(chartView.StartEnd[1], cote.Seuil));
-                        <RadzenLineSeries Data="@coteMesures" CategoryProperty="Date" ValueProperty="Valeur" Title="@cote.Libellé" LineType="LineType.Dashed"/>
+                        <RadzenLineSeries Data="@coteMesures" CategoryProperty="Date" ValueProperty="Valeur" Title="@cote.Libellé" LineType="LineType.Dashed" Hidden="true"/>
                     }
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Hauteur (m)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:f}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:g}"/>
                 </RadzenChart>
             }
         </div>
@@ -54,19 +59,19 @@
                 <RadzenChart @ref="DebitChart" Style="margin-top: 30px">
                     @if (chartView.LimniItems.Count > 0)
                     {                    
-                        @for (int i = 0; i <chartView.LimniItems.Count; i++)
+                        @for (int i = 0; i < chartView.LimniItems.Count; i++)
                         {
                             if (chartView.LimniItems[i].Capteur.Principal == true)
                             {
                                 <RadzenLineSeries Smooth="true" Data="@chartView.LimniItems[i].Mesures" CategoryProperty="Date" ValueProperty="DebitSortant" Title="Debit Sortant"/>
                                 <RadzenLineSeries Smooth="true" Data="@chartView.LimniItems[i].Mesures" CategoryProperty="Date" ValueProperty="DebitEntrant15mn" Title="Debit Entrant Lissé 15 min"/>
-                           }
+                            }
                         }
                     }
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Debit (m3/s)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:f}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" Padding="30" FormatString="{0:g}"/>
                 </RadzenChart>
             }
         </div>
@@ -82,7 +87,7 @@
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Pluie (mm)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:f}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:g}"/>
                 </RadzenChart>
             }
         </div>
@@ -110,7 +115,7 @@
                     <RadzenValueAxis Formatter="@Format">
                         <RadzenAxisTitle Text="Température (°C)" />
                     </RadzenValueAxis>
-                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:f}"/>
+                    <RadzenCategoryAxis Step="@chartView.Step" FormatString="{0:g}"/>
                 </RadzenChart>
             }
         </div>
@@ -139,8 +144,8 @@
                 <RadzenButton Text="Tout Exporter" Icon="save" Click=@OnClickAll ButtonStyle="ButtonStyle.Success"/>
             }
         </div>
-    }
-</RadzenCard>
+    </RadzenCard>
+}
 <style>
 .inner {
     padding-top:25px;
@@ -155,6 +160,7 @@
     DateTime date2 = DateTime.Now;
 
     private ChartView chartView = new();
+    private List<RadzenLineSeries<Mesure>> series = new();
     private List<Mesure>? pluvioQuotidienne = new();
     private List<MesurePluvioQuotidienneView>? pluvioQuotidienneView = new();
     private Barrage? barrage = new();
@@ -189,20 +195,24 @@
     protected async Task OnClickLimni()
     {
         List<MesureLimniCSV> mesures = new();
-        foreach (LimniItem item in chartView.LimniItems)
+        for (int i = 0; i < chartView.LimniItems.Count; i++)
         {
-            if (item.Capteur.Principal == true)
+            LimniItem item = chartView.LimniItems[i];
+            if (((IChartSeries)series[i]).Visible == true)
             {
-                foreach (Mesure mesure in item.Mesures)
+                if (item.Capteur.Principal == true)
                 {
-                    mesures.Add(new MesureLimniCSV(barrage!.Libellé!, item.Capteur.Libellé!, mesure.Date, mesure.Valeur, mesure.Volume, mesure.DebitSortant, mesure.DebitEntrant15mn));
+                    foreach (Mesure mesure in item.Mesures)
+                    {
+                        mesures.Add(new MesureLimniCSV(barrage!.Libellé!, item.Capteur.Libellé!, mesure.Date, mesure.Valeur, mesure.Volume, mesure.DebitSortant, mesure.DebitEntrant15mn));
+                    }
                 }
-            }
-            else
-            {
-                foreach (Mesure mesure in item.Mesures)
+                else
                 {
-                    mesures.Add(new MesureLimniCSV(barrage!.Libellé!, item.Capteur.Libellé!, mesure.Date, mesure.Valeur));
+                    foreach (Mesure mesure in item.Mesures)
+                    {
+                        mesures.Add(new MesureLimniCSV(barrage!.Libellé!, item.Capteur.Libellé!, mesure.Date, mesure.Valeur));
+                    }
                 }
             }
         }
@@ -266,13 +276,15 @@
     {
         await JS.InvokeVoidAsync("downloadFileFromStream", name, new DotNetStreamReference(stream));
     }
-
     protected override async Task OnParametersSetAsync() { CultureInfo.CurrentUICulture = new CultureInfo("fr-FR"); await SetChart(); }
+    protected override async Task OnInitializedAsync() { CultureInfo.CurrentUICulture = new CultureInfo("fr-FR"); await SetChart(); }
 
     protected async Task SetChart()
     {
+        chartView.IsLoaded = false;
         chartView = new();
         chartView.SetDate(date1, date2);
+        pluvioQuotidienneView = new();
         CultureInfo.CurrentUICulture = new CultureInfo("fr-FR");
 
         HttpClient client = new();
@@ -289,6 +301,7 @@
             {
                 if(capteur.Type!.Id == 1)
                 {
+                    series.Add(new());
                     var request = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.barrageAPI + "/Mesure/idBarrage=" + barrage.Id + "/idCapteur=" + capteur.Id));
                     request.Content = JsonContent.Create(chartView.StartEnd);
                     var response = await client.SendAsync(request).ConfigureAwait(false);
@@ -339,6 +352,7 @@
             }
         }
         Reload();
+        Console.WriteLine(chartView.LimniItems.Count);
         chartView.IsLoaded = true; 
     }
 }

@@ -15,4 +15,3 @@ rm -rf bin
 dotnet publish --force --nologo ./WebSite/WebSite.csproj --configuration Release --framework net6.0 --output ./bin
 docker build . -t barragev3 -f ./WebSite/Dockerfile
 rm -rf bin
-docker-compose up

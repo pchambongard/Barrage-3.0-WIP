@@ -2,8 +2,8 @@
 @using Barrage_Model
 
 <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Barrage 3.0</a>
+    <div class="container-fluid" style="justify-content:center;">
+        <a class="navbar-brand" href="" >Barrage 3.0</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -22,7 +22,7 @@
             var link = "/barrage/" + barrage.Id;
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="@link">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> @barrage.Libellé
+                    <span class="oi oi-droplet" aria-hidden="true"></span> @barrage.Libellé
                 </NavLink>
             </div>
         }

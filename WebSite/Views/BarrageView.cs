@@ -30,18 +30,58 @@ namespace WebSite.Views
 			if (Cotes.Find(x => x.Criticité == 2) != null)
 			{
 				Crue = Math.Truncate((double)Cotes.Find(x => x.Criticité == 2)!.Seuil);
-				Min = Math.Truncate((double)Cotes.Find(x => x.Criticité == 0)!.Seuil * 0.8);
+				Min = Math.Truncate((double)Cotes.Find(x => x.Criticité == 0)!.Seuil * 0.925);
 				if (Cotes.Find(x => x.Criticité == 4) != null)
 				{
 					Danger = (double)Cotes.Find(x => x.Criticité == 4)!.Seuil;
-					Max = Math.Truncate(Danger * 1.2);
+					Max = Math.Truncate(Danger * 1.05);
 				}
 				else
 				{
-					Max = Math.Truncate(Crue * 1.2);
+					Max = Math.Truncate(Crue * 1.05);
 					Danger = Max;
 				}
+				SetMinMax();
 				Step = (Max - Min) / 4;
+			}
+		}
+		public void SetMinMax()
+		{
+			switch (Id)
+			{
+				case 1:
+					{
+						Min = 145;
+						Max = 160;
+						break;
+					}
+				case 2:
+					{
+						Min = 105;
+						Max = 130;
+						break;
+					}
+				case 3:
+					{
+						Min = 70;
+						Max = 90;
+						break;
+					}
+				case 4:
+					{
+						Min = 230;
+						Max = 267;
+						break;
+					}
+				case 5:
+					{
+						Min = 210;
+						Max = 272;
+						break;
+					}
+				default:
+					break;
+
 			}
 		}
 	}

@@ -632,7 +632,7 @@ else
 
         var authRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(Infos.authldapadAPI));
         authRequest.Content = JsonContent.Create(infos);
-        var authResponse = await client.SendAsync(authRequest);
+        var authResponse = await client.SendAsync(authRequest).ConfigureAwait(false);
         if (authResponse.IsSuccessStatusCode)
         {
             authRet = await authResponse.Content.ReadFromJsonAsync<AuthLDAP_ADReturnObject>().ConfigureAwait(false);
