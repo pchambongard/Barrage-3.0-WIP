@@ -19,15 +19,9 @@ namespace Auth_LDAP_AD_API.Session
 		{
 			try
 			{
-				// if (infos.Count == 3)
-				// {
-				// 	Session auth = new(infos[0]);
-				// 	return Ok(auth.GetAuthLDAP_AD(infos[1], infos[2]));
-				// }
-				if (infos.Count == 4)
+				if (infos.Count == 3)
 				{
-					Session auth = new(infos[0]);
-					return Ok(auth.GetAuthLDAP_AD_Filter(infos[1], infos[2], infos[3]));
+					return Ok(Session.GetAuthLDAP_AD_Filter(infos[0], infos[1], infos[2]));
 				}
 				else
 				{

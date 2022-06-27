@@ -437,8 +437,8 @@
 }
 else
 {
-    <RadzenCard Style="width: 30%;">
-        <h2 class="mb-4">Login</h2>
+    <RadzenCard Style="width: 50%;">
+        <h2 class="mb-4">connectez-vous:</h2>
         <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args)) />
         <div style="float:left; padding-top:10px">
             <RadzenIcon Icon="assignment_late" IconStyle="IconStyle.Danger" Visible="@isLoginWarningVisible"/>
@@ -625,7 +625,6 @@ else
         HttpClient client = new();
         List<string> infos = new();
 
-        infos.Add(Infos.authSearchBase);
         infos.Add(args.Username);
         infos.Add(args.Password);
         infos.Add(Infos.authFilter);

@@ -2,6 +2,6 @@
 {
     public static class Infos
     {
-        public const string dbConn = "Server=srw-pgtest;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false";
+        public const string dbConn = "Server=srw-pgprod;Port=5432;Database=barrage;User Id=pgbarrage;Password=DbaBarrage!30;Pooling=false";
     }
 }
